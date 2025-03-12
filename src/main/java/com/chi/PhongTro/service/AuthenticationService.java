@@ -80,7 +80,7 @@ public class AuthenticationService {
         JWSHeader jwsHeader = new JWSHeader(JWSAlgorithm.HS512);
 
         JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
-                .subject(users.getUsername())
+                .subject(users.getPhone())
                 .issuer("phongtro.com")
                 .issueTime(new Date())
                 .expirationTime(new Date(

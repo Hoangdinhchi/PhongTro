@@ -12,6 +12,9 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -42,6 +45,18 @@ public class UserService {
         return userMapper.toUserReponse(usersRepository.save(users));
     }
 
+
+    public UserResponse getMyInfor(){
+        var context = SecurityContextHolder.getContext();
+
+        Users users = usersRepository.findByPhone(context.getAuthentication().getName()).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+
+        return userMapper.toUserReponse(users);
+
+    }
+
+
+    @PreAuthorize("hasRole('ADMIN')")
     public List<UserResponse> getUser(){
         List<Users> users = usersRepository.findAll();
         return users.stream()
@@ -49,10 +64,13 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
+
+    @PostAuthorize("returnObject.phone == authentication.name || hasRole('ADMIN')")
     public void deleteUser(String userid){
         usersRepository.deleteById(userid);
     }
 
+    @PostAuthorize("returnObject.phone == authentication.name || hasRole('ADMIN')")
     public UserResponse updateUser(UserUpdateRequest request, String userid) {
         Users users = usersRepository.findById(userid)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
@@ -64,6 +82,8 @@ public class UserService {
 
     }
 
+
+    @PostAuthorize("returnObject.phone == authentication.name || hasRole('ADMIN')")
     public UserResponse getUser(String userId){
         return userMapper.toUserReponse(usersRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED)));
     }

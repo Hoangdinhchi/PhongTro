@@ -4,13 +4,11 @@ import com.chi.PhongTro.dto.Request.ApiResponse;
 import com.chi.PhongTro.dto.Request.UserCreationRequest;
 import com.chi.PhongTro.dto.Request.UserUpdateRequest;
 import com.chi.PhongTro.dto.Response.UserResponse;
-import com.chi.PhongTro.entity.Users;
 import com.chi.PhongTro.service.UserService;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -55,6 +53,14 @@ public class UserController {
         ApiResponse<UserResponse> apiResponse = new ApiResponse<>();
         apiResponse.setResult(userService.getUser(userId));
         return apiResponse;
+    }
+
+    @GetMapping("/myinfor")
+    ApiResponse<UserResponse> getMyInfor(){
+        return ApiResponse.<UserResponse>builder()
+                .code(1000)
+                .result(userService.getMyInfor())
+                .build();
     }
 
 
