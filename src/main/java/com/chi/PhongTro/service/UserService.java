@@ -11,7 +11,6 @@ import com.chi.PhongTro.repository.UsersRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -46,7 +45,7 @@ public class UserService {
     }
 
 
-    public UserResponse getMyInfor(){
+    public UserResponse getMyInfo(){
         var context = SecurityContextHolder.getContext();
 
         Users users = usersRepository.findByPhone(context.getAuthentication().getName()).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));

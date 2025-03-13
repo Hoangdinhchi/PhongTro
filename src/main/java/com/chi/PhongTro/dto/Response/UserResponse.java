@@ -19,5 +19,4 @@ public class UserResponse {
     String avatar;
     Role role;
     LocalDate created_at;
-
 }

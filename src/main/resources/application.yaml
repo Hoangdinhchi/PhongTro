@@ -12,3 +12,7 @@ spring:
 jwt:
   signerKey: "WRT8OnU7TeWE0R/DLuS9BrvYV9hVSfAt1Co5ZWXkG3KRYajL8FpjsuVYoE0eVWw9"
 
+file:
+  uploadDir: "C:/DoAnTotNghiep/UploadMedia"
+
+

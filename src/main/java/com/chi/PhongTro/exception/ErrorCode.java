@@ -13,7 +13,9 @@ public enum ErrorCode {
     PASSWORD_BLANK(1009, "Mật khẩu không được để trống"),
     USER_NOT_EXISTED(1010, "Người dùng không tồn tại"),
     PHONE_NOT_EXISTED(1011, "Số điện thoại không tồn tại"),
-    UNAUTHENTICATED(1012, "Xác thực không thành công")
+    UNAUTHENTICATED(1012, "Xác thực không thành công"),
+    ROOM_TYPE_NOT_EXISTED(1013, "Loại phòng không tồn tại"),
+    UTILITY_NOT_EXISTED(1014, "Tiện ích không tồn tại")
     ;
 
     ErrorCode(int code, String message) {

@@ -55,11 +55,11 @@ public class UserController {
         return apiResponse;
     }
 
-    @GetMapping("/myinfor")
-    ApiResponse<UserResponse> getMyInfor(){
+    @GetMapping("/my_info")
+    ApiResponse<UserResponse> getMyInfo(){
         return ApiResponse.<UserResponse>builder()
                 .code(1000)
-                .result(userService.getMyInfor())
+                .result(userService.getMyInfo())
                 .build();
     }
 
