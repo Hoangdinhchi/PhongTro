@@ -64,7 +64,7 @@ public class UserService {
     }
 
 
-    @PostAuthorize("returnObject.phone == authentication.name || hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public void deleteUser(String userid){
         usersRepository.deleteById(userid);
     }

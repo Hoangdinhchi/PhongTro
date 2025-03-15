@@ -27,7 +27,7 @@ public class PostResponse {
     Double price;
     Double area;
     List<String> utilities;
-    List<MediaDTO> mediaDTOS;
+    List<MediaDTO> mediaDTO;
     String status;
     LocalDate created_at;
     int view_count;
@@ -48,7 +48,7 @@ public class PostResponse {
                 .stream()
                 .map(Utilities::getName)
                 .collect(Collectors.toList());
-        this.mediaDTOS = post.getMedia() != null
+        this.mediaDTO = post.getMedia() != null
                 ? post.getMedia().stream()
                 .map(media -> new MediaDTO(media.getFile_url(), media.getFile_type()))
                 .collect(Collectors.toList()) :

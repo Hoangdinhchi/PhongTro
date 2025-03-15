@@ -14,8 +14,23 @@ public enum ErrorCode {
     USER_NOT_EXISTED(1010, "Người dùng không tồn tại"),
     PHONE_NOT_EXISTED(1011, "Số điện thoại không tồn tại"),
     UNAUTHENTICATED(1012, "Xác thực không thành công"),
-    ROOM_TYPE_NOT_EXISTED(1013, "Loại phòng không tồn tại"),
-    UTILITY_NOT_EXISTED(1014, "Tiện ích không tồn tại")
+
+    ROOM_TYPE_NOT_EXISTED(1031, "Loại phòng không tồn tại"),
+    UTILITY_NOT_EXISTED(1032, "Tiện ích không tồn tại"),
+    POST_TITLE_BLANK(1030, "Tiêu đề không được bỏ trống"),
+    POST_TITLE_TOO_SHORT(1042, "Tiêu đề phải có ít nhất 10 ký tự"),
+    POST_DESCRIPTION_BLANK(1033, "Mô tả không được bỏ trống"),
+    POST_DESCRIPTION_TOO_SHORT(1043, "Mô tả phải có ít nhất 20 ký tự"),
+    POST_ADDRESS_BLANK(1034, "Địa chỉ không được bỏ trống"),
+    POST_CITY_BLANK(1035, "Thành phố không được bỏ trống"),
+    POST_DISTRICT_BLANK(1036, "Quận/Huyện không được bỏ trống"),
+    POST_PRICE_INVALID(1037, "Giá phải lớn hơn 0"),
+    POST_AREA_INVALID(1038, "Diện tích phải lớn hơn 0"),
+    POST_UTILITY_IDS_EMPTY(1039, "Danh sách tiện ích không được bỏ trống"),
+    POST_MEDIA_EMPTY(1040, "Phải có ít nhất một hình ảnh"),
+    POST_MEDIA_INVALID(1041, "Tệp phương tiện không hợp lệ"),
+    FILE_PROCESSING_ERROR(1042, "Lỗi khi xử lý file"),
+    POST_NOT_FOUND(1043, "Bài đăng không tồn tại")
     ;
 
     ErrorCode(int code, String message) {

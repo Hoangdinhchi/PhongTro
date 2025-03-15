@@ -6,6 +6,7 @@ import com.chi.PhongTro.dto.Request.PostCreationRequest;
 import com.chi.PhongTro.dto.Response.PostResponse;
 import com.chi.PhongTro.entity.Posts;
 import com.chi.PhongTro.service.PostService;
+import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -24,7 +25,7 @@ public class PostController {
     PostService postService;
 
     @PostMapping(consumes = "multipart/form-data")
-    ApiResponse<PostResponse> createPost(@ModelAttribute PostCreationRequest request) throws IOException{
+    ApiResponse<PostResponse> createPost(@ModelAttribute @Valid PostCreationRequest request) throws IOException{
 
         ApiResponse<PostResponse> apiResponse = new ApiResponse<>();
         apiResponse.setResult(postService.createPost(request));
@@ -36,5 +37,13 @@ public class PostController {
         ApiResponse<List<PostResponse>> apiResponse = new ApiResponse<>();
         apiResponse.setResult(postService.getAllPost());
         return apiResponse;
+    }
+
+    @DeleteMapping("/{postId}")
+    ApiResponse<String> deletePost(@PathVariable String postId){
+        postService.deletePost(postId);
+        return ApiResponse.<String>builder()
+                .result("Đã xóa bài đăng")
+                .build();
     }
 }
