@@ -52,7 +52,10 @@ public class Posts {
 
     String status;
     LocalDate created_at;
+
     int view_count;
     int save_count;
 
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comments> comments = new ArrayList<>();
 }

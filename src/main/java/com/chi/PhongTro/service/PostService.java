@@ -3,6 +3,7 @@ package com.chi.PhongTro.service;
 
 import com.chi.PhongTro.dto.Request.PostCreationRequest;
 import com.chi.PhongTro.dto.Request.PostFilterRequest;
+import com.chi.PhongTro.dto.Request.PostStatusUpdateRequest;
 import com.chi.PhongTro.dto.Request.PostUpdateRequest;
 import com.chi.PhongTro.dto.Response.PostResponse;
 import com.chi.PhongTro.entity.Media;
@@ -239,6 +240,13 @@ public class PostService {
                 .collect(Collectors.toList());
     }
 
+    public PostResponse getPost(String postId){
+
+        incrementViewCount(postId);
+        return new PostResponse(postRepository.findById(postId)
+                .orElseThrow(() -> new AppException(ErrorCode.POST_NOT_FOUND)));
+    }
+
     public Page<PostResponse> getPostsWithFilter(PostFilterRequest request) {
         Specification<Posts> spec = PostSpecification.filterPost(
                 request.getTypeId(),
@@ -261,6 +269,18 @@ public class PostService {
         return postsPage.map(PostResponse::new);
     }
 
+    @PreAuthorize("@postService.checkDeletePermission(#postId, authentication)")
+    public void updateStatusPost(String postId, PostStatusUpdateRequest request){
+        Posts post = postRepository.findById(postId).orElseThrow(
+                () -> new AppException(ErrorCode.POST_NOT_FOUND)
+        );
+        if (!List.of("display", "hidden").contains(request.getStatus())) {
+            throw new AppException(ErrorCode.INVALID_STATUS);
+        }
+        post.setStatus(request.getStatus());
+        postRepository.save(post);
+    }
+
     @Transactional
     @PreAuthorize("@postService.checkDeletePermission(#postId, authentication)")
     public void deletePost(String postId){
@@ -279,4 +299,17 @@ public class PostService {
                 .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN")) ||
                 post.getUser().getPhone().equals(currentUserPhone);
     }
+
+    public PostResponse incrementViewCount(String postId) {
+        Posts post = postRepository.findById(postId)
+                .orElseThrow(() -> new AppException(ErrorCode.POST_NOT_FOUND));
+
+        post.setView_count(post.getView_count() + 1);
+        Posts updatedPost = postRepository.save(post);
+        return new PostResponse(updatedPost);
+    }
+
+
+
+
 }

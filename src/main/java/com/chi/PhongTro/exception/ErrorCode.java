@@ -30,7 +30,10 @@ public enum ErrorCode {
     POST_MEDIA_EMPTY(1040, "Phải có ít nhất một hình ảnh"),
     POST_MEDIA_INVALID(1041, "Tệp phương tiện không hợp lệ"),
     FILE_PROCESSING_ERROR(1042, "Lỗi khi xử lý file"),
-    POST_NOT_FOUND(1043, "Bài đăng không tồn tại")
+    POST_NOT_FOUND(1043, "Bài đăng không tồn tại"),
+    INVALID_STATUS(1044, "Trạng thái bài đăng không hợp lệ"),
+
+    COMMENT_NOT_FOUND(1050, "Bình luận không tồn tại")
     ;
 
     ErrorCode(int code, String message) {

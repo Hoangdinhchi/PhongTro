@@ -1,10 +1,7 @@
 package com.chi.PhongTro.controller;
 
 
-import com.chi.PhongTro.dto.Request.ApiResponse;
-import com.chi.PhongTro.dto.Request.PostCreationRequest;
-import com.chi.PhongTro.dto.Request.PostFilterRequest;
-import com.chi.PhongTro.dto.Request.PostUpdateRequest;
+import com.chi.PhongTro.dto.Request.*;
 import com.chi.PhongTro.dto.Response.PostResponse;
 import com.chi.PhongTro.service.PostService;
 import jakarta.validation.Valid;
@@ -62,6 +59,14 @@ public class PostController {
     ApiResponse<PostResponse> updatePost(@PathVariable String postId,@ModelAttribute @Valid PostUpdateRequest request) throws IOException{
         return ApiResponse.<PostResponse>builder()
                 .result(postService.updatePost(postId, request))
+                .build();
+    }
+
+    @PatchMapping("/{postId}/status")
+    ApiResponse<String> updateStatusPost(@PathVariable String postId, @RequestBody @Valid PostStatusUpdateRequest request){
+        postService.updateStatusPost(postId, request);
+        return ApiResponse.<String>builder()
+                .result("Cập nhật trạng thái thành công")
                 .build();
     }
 }
