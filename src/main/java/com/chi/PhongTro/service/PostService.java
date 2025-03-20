@@ -2,6 +2,8 @@ package com.chi.PhongTro.service;
 
 
 import com.chi.PhongTro.dto.Request.PostCreationRequest;
+import com.chi.PhongTro.dto.Request.PostFilterRequest;
+import com.chi.PhongTro.dto.Request.PostUpdateRequest;
 import com.chi.PhongTro.dto.Response.PostResponse;
 import com.chi.PhongTro.entity.Media;
 import com.chi.PhongTro.entity.Posts;
@@ -9,13 +11,20 @@ import com.chi.PhongTro.exception.AppException;
 import com.chi.PhongTro.exception.ErrorCode;
 import com.chi.PhongTro.mapper.PostMapper;
 import com.chi.PhongTro.repository.*;
+import com.chi.PhongTro.specification.PostSpecification;
 import com.chi.PhongTro.util.TypeMedia;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -28,10 +37,13 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service("postService")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -68,9 +80,69 @@ public class PostService {
         posts.setSave_count(0);
 
 
+        List<Media> mediaList = handleFile(request.getMedia(), posts);
+
+        Posts savePost = postRepository.save(posts);
+        if(mediaList != null){
+            savePost.setMedia(mediaList);
+            mediaRepository.saveAll(mediaList);
+        }
+
+        return new PostResponse(savePost);
+    }
+
+    @Transactional(rollbackOn = IOException.class)
+    @PreAuthorize("@postService.checkDeletePermission(#postId, authentication)")
+    public PostResponse updatePost(String postId, PostUpdateRequest request) throws IOException {
+        Posts post = postRepository.findById(postId)
+                .orElseThrow(() -> new AppException(ErrorCode.POST_NOT_FOUND));
+
+        postMapper.updatePost(post, request);
+
+        if (request.getTypeId() != null) {
+            post.setType(roomTypesRepository.findById(String.valueOf(request.getTypeId()))
+                    .orElseThrow(() -> new AppException(ErrorCode.ROOM_TYPE_NOT_EXISTED)));
+        }
+        if (request.getUtilityIds() != null && !request.getUtilityIds().isEmpty()) {
+            post.setUtilities(request.getUtilityIds().stream()
+                    .map(id -> utilitiesRepository.findById(String.valueOf(id))
+                            .orElseThrow(() -> new AppException(ErrorCode.UTILITY_NOT_EXISTED)))
+                    .collect(Collectors.toSet()));
+        }
+
+
+        if (request.getMedia() != null && !request.getMedia().isEmpty()) {
+
+            deleteFile(post.getMedia());
+
+
+            List<Media> mediaList = new ArrayList<>(handleFile(request.getMedia(), post));
+            post.setMedia(mediaList);
+            mediaRepository.saveAll(mediaList);
+        }
+
+        Posts updatedPost = postRepository.save(post);
+        return new PostResponse(updatedPost);
+    }
+
+    private void deleteFile(List<Media> mediaList){
+        if (mediaList != null) {
+            for (Media media : mediaList) {
+                Path filePath = Paths.get(uploadDir, media.getFile_url().substring(uploadDir.length() + 1));
+                try {
+                    Files.deleteIfExists(filePath);
+                } catch (IOException e) {
+                    log.error("File do not exists: " + filePath);
+                }
+            }
+            mediaRepository.deleteAll(mediaList);
+        }
+    }
+
+    private List<Media> handleFile(List<MultipartFile> files, Posts posts){
         List<Media> mediaList = null;
-        if (request.getMedia() != null && !request.getMedia().isEmpty()){
-            mediaList = request.getMedia().stream()
+        if (files != null && !files.isEmpty()){
+            mediaList = files.stream()
                     .filter(file -> file != null && !file.isEmpty())
                     .map(file -> {
                         try {
@@ -80,15 +152,8 @@ public class PostService {
                         }
                     })
                     .toList();
-
         }
-        Posts savePost = postRepository.save(posts);
-        if(mediaList != null){
-            savePost.setMedia(mediaList);
-            mediaRepository.saveAll(mediaList);
-        }
-
-        return new PostResponse(savePost);
+        return mediaList;
     }
 
     private Media processFile(MultipartFile file, Posts post) throws IOException {
@@ -174,8 +239,30 @@ public class PostService {
                 .collect(Collectors.toList());
     }
 
+    public Page<PostResponse> getPostsWithFilter(PostFilterRequest request) {
+        Specification<Posts> spec = PostSpecification.filterPost(
+                request.getTypeId(),
+                request.getCity(),
+                request.getDistrict(),
+                request.getAddress(),
+                request.getMinPrice(),
+                request.getMaxPrice(),
+                request.getMinArea(),
+                request.getMaxArea()
+        );
+
+        Pageable pageable = PageRequest.of(
+                request.getPage(),
+                request.getSize(),
+                Sort.by("created_at").descending()
+        );
+
+        Page<Posts> postsPage = postRepository.findAll(spec, pageable);
+        return postsPage.map(PostResponse::new);
+    }
+
     @Transactional
-    @PreAuthorize("@postService.checkDeletePermission(#postId, principal)")
+    @PreAuthorize("@postService.checkDeletePermission(#postId, authentication)")
     public void deletePost(String postId){
         Posts post = postRepository.findById(postId)
                 .orElseThrow(() -> new AppException(ErrorCode.POST_NOT_FOUND));

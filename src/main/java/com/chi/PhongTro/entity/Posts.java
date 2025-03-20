@@ -6,6 +6,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -47,7 +48,7 @@ public class Posts {
     Set<Utilities> utilities;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    List<Media> media;
+    List<Media> media = new ArrayList<>();
 
     String status;
     LocalDate created_at;

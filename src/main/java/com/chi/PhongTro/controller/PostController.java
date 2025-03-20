@@ -3,14 +3,16 @@ package com.chi.PhongTro.controller;
 
 import com.chi.PhongTro.dto.Request.ApiResponse;
 import com.chi.PhongTro.dto.Request.PostCreationRequest;
+import com.chi.PhongTro.dto.Request.PostFilterRequest;
+import com.chi.PhongTro.dto.Request.PostUpdateRequest;
 import com.chi.PhongTro.dto.Response.PostResponse;
-import com.chi.PhongTro.entity.Posts;
 import com.chi.PhongTro.service.PostService;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -39,11 +41,27 @@ public class PostController {
         return apiResponse;
     }
 
+//    @GetMapping
+//    ApiResponse<Page<PostResponse>> getPosts(PostFilterRequest request){
+//        return ApiResponse.<Page<PostResponse>>builder()
+//                .result(postService.getPostsWithFilter(request))
+//                .build();
+//    }
+
     @DeleteMapping("/{postId}")
     ApiResponse<String> deletePost(@PathVariable String postId){
         postService.deletePost(postId);
         return ApiResponse.<String>builder()
+                .code(1000)
                 .result("Đã xóa bài đăng")
+                .build();
+    }
+
+
+    @PutMapping("/{postId}")
+    ApiResponse<PostResponse> updatePost(@PathVariable String postId,@ModelAttribute @Valid PostUpdateRequest request) throws IOException{
+        return ApiResponse.<PostResponse>builder()
+                .result(postService.updatePost(postId, request))
                 .build();
     }
 }
