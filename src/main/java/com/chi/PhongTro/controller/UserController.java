@@ -1,6 +1,7 @@
 package com.chi.PhongTro.controller;
 
 import com.chi.PhongTro.dto.Request.ApiResponse;
+import com.chi.PhongTro.dto.Request.RegisterRequest;
 import com.chi.PhongTro.dto.Request.UserCreationRequest;
 import com.chi.PhongTro.dto.Request.UserUpdateRequest;
 import com.chi.PhongTro.dto.Response.UserResponse;
@@ -22,7 +23,15 @@ public class UserController {
 
     UserService userService;
 
-    @PostMapping
+    @PostMapping("/otp")
+    ApiResponse<String> initiateRegistration(@RequestBody @Valid RegisterRequest request){
+        userService.initiateRegistration(request);
+        return ApiResponse.<String>builder()
+                .result("Đã gửi OTP vào số: " + request.getPhone())
+                .build();
+    }
+
+    @PostMapping("/register")
     ApiResponse<UserResponse> createUser(@RequestBody @Valid UserCreationRequest request){
         ApiResponse<UserResponse> apiResponse = new ApiResponse<>();
         apiResponse.setResult(userService.createRequest(request));

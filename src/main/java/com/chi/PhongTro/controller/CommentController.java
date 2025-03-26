@@ -33,7 +33,7 @@ public class CommentController {
                 .build();
     }
 
-    // Lấy tất cả bình luận của bài đăng
+
     @GetMapping
     public ApiResponse<List<CommentResponse>> getCommentsByPostId(@PathVariable long postId) {
         List<CommentResponse> comments = commentService.getCommentsByPostId(postId);
@@ -55,7 +55,7 @@ public class CommentController {
                 .build();
     }
 
-    // Xóa bình luận
+
     @DeleteMapping("/{commentId}")
     public ApiResponse<String> deleteComment(
             @PathVariable String postId,

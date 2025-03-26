@@ -50,6 +50,9 @@ public class Posts {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     List<Media> media = new ArrayList<>();
 
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Reports> reports = new ArrayList<>();
+
     String status;
     LocalDate created_at;
 

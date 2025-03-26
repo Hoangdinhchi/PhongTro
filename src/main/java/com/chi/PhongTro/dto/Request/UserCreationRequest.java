@@ -41,4 +41,6 @@ public class UserCreationRequest {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     LocalDate created_at;
 
+    String otpCode;
+
 }

@@ -8,7 +8,9 @@ import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "Users")
@@ -26,6 +28,18 @@ public class Users {
     String email;
     String phone;
     String avatar;
+
+    @OneToMany(mappedBy = "reporter", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Reports> reportsAsReporter = new ArrayList<>();
+
+    @OneToMany(mappedBy = "reportedUser", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Reports> reportsAsReportedUser = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Buildings> buildings = new ArrayList<>();
+
+    @Column(name = "phone_verified", nullable = false)
+    private boolean phoneVerified;
 
     @Enumerated(EnumType.STRING) // Lưu ENUM dưới dạng chuỗi
     @Column(nullable = false, columnDefinition = "ENUM('OWNER', 'RENTER', 'ADMIN') DEFAULT 'RENTER'")

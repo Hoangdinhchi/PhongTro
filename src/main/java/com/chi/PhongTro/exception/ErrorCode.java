@@ -31,9 +31,23 @@ public enum ErrorCode {
     POST_MEDIA_INVALID(1041, "Tệp phương tiện không hợp lệ"),
     FILE_PROCESSING_ERROR(1042, "Lỗi khi xử lý file"),
     POST_NOT_FOUND(1043, "Bài đăng không tồn tại"),
-    INVALID_STATUS(1044, "Trạng thái bài đăng không hợp lệ"),
+    INVALID_STATUS(1044, "Trạng thái không hợp lệ"),
 
-    COMMENT_NOT_FOUND(1050, "Bình luận không tồn tại")
+    COMMENT_NOT_FOUND(1050, "Bình luận không tồn tại"),
+    COMMENT_NULL(1051, "Bình luận không được đổ trống"),
+    COMMENT_BLANK(1052, "Bình luận không được đổ trống"),
+
+    REPORT_NOT_FOUND(1060, "Báo cáo không tồn tại"),
+
+    OTP_NOT_FOUND(1070, "Vui lòng gửi lại OTP"),
+    OTP_EXPIRED(1071, "OTP sai"),
+    OTP_INVALID(1072, "OTP sai"),
+
+    BUILDING_NOT_FOUND(1080, "Dãy phòng không tồn tại"),
+    ROOM_NOT_FOUND(1081, "Phòng không tồn tại"),
+    BUILDING_HAS_ROOMS(1082, "Không thể xóa dãy phòng (Dãy còn phòng)"),
+    NAME_BUILDING_BLANK(1083, "Vui lòng nhập tên dãy phòng"),
+
     ;
 
     ErrorCode(int code, String message) {

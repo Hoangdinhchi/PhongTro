@@ -1,7 +1,6 @@
 package com.chi.PhongTro.dto.Request;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -10,8 +9,8 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class CommentCreationRequest {
-    @NotNull(message = "COMMENT_NULL")
-    @NotBlank(message = "COMMENT_BLANK")
-    String content;
+public class BuildingUpdateRequest {
+    @NotBlank(message = "NAME_BUILDING_BLANK")
+    String name;
+    String description;
 }
