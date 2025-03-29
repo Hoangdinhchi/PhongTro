@@ -38,6 +38,9 @@ public class Users {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Buildings> buildings = new ArrayList<>();
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Renters> renters = new ArrayList<>();
+
     @Column(name = "phone_verified", nullable = false)
     private boolean phoneVerified;
 

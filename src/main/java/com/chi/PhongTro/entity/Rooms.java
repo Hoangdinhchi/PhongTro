@@ -5,6 +5,8 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "rooms")
@@ -27,12 +29,20 @@ public class Rooms {
     String roomNumber;
 
     @Column(nullable = false)
-    String status; // Ví dụ: "available", "occupied", "maintenance"
+    String status;
 
-    private Integer occupants; // Số người hiện tại trong phòng
+    private Integer occupants;
 
     @Column(nullable = false)
     Double price;
+
+    @ManyToMany
+    @JoinTable(
+            name = "room_renters",
+            joinColumns = @JoinColumn( name = "room_id"),
+            inverseJoinColumns = @JoinColumn( name = "renter_id")
+    )
+    List<Renters> renters = new ArrayList<>();
 
     @Column(name = "created_at", nullable = false)
     LocalDate createdAt;

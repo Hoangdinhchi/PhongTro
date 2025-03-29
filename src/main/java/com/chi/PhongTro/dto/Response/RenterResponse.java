@@ -11,14 +11,13 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class BuildingResponse {
-    Long buildingId;
+public class RenterResponse {
+    Long renterId;
     Long userId;
-    String userPhone;
-    String name;
-    String street;
-    String district;
-    String city;
-    String description;
+    String avatar;
+    String fullName;
+    String phone;
+    String email;
+    Boolean has_account;
     LocalDate createdAt;
 }

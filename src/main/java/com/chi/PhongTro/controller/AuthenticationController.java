@@ -3,6 +3,7 @@ package com.chi.PhongTro.controller;
 import com.chi.PhongTro.dto.Request.ApiResponse;
 import com.chi.PhongTro.dto.Request.AuthenticationRequest;
 import com.chi.PhongTro.dto.Request.IntrospectRequest;
+import com.chi.PhongTro.dto.Request.LogoutRequest;
 import com.chi.PhongTro.dto.Response.AuthenticationResponse;
 import com.chi.PhongTro.dto.Response.IntrospectResponse;
 import com.chi.PhongTro.service.AuthenticationService;
@@ -33,6 +34,15 @@ public class AuthenticationController {
         return ApiResponse.<AuthenticationResponse>builder()
                 .code(1000)
                 .result(result)
+                .build();
+    }
+
+    @PostMapping("/logout")
+    ApiResponse<Void> logout(@RequestBody LogoutRequest request)
+            throws ParseException, JOSEException {
+        authenticationService.logout(request);
+        return ApiResponse.<Void>builder()
+                .code(1000)
                 .build();
     }
 

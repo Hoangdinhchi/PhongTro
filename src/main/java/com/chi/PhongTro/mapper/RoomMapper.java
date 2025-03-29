@@ -5,7 +5,7 @@ import com.chi.PhongTro.entity.Rooms;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {RenterMapper.class})
 public interface RoomMapper {
 
     @Mapping(target = "buildingId", source = "building.buildingId")

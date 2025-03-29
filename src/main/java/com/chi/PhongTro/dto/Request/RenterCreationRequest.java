@@ -1,6 +1,7 @@
 package com.chi.PhongTro.dto.Request;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -9,11 +10,14 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class BuildingUpdateRequest {
-    @NotBlank(message = "NAME_BUILDING_BLANK")
-    String name;
-    String street;
-    String district;
-    String city;
-    String description;
+public class RenterCreationRequest {
+
+
+
+    @NotBlank(message = "FULL_NAME_BLANK")
+    String fullName;
+
+    @NotBlank(message = "PHONE_BLANK")
+    String phone;
+    String email;
 }

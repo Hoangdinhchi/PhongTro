@@ -11,15 +11,17 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class RoomResponse {
+public class InvoiceResponse {
+    Long invoiceId;
+    String ownerName;
+    String ownerPhone;
     Long roomId;
-    Long buildingId;
-    String buildingName;
     String roomNumber;
+    Long renterId;
+    String renterFullName;
+    Double totalAmount;
     String status;
-    Integer occupants;
-    Double price;
-    List<RenterResponse> renters;
-
+    LocalDate dueDate;
+    List<InvoiceDetailResponse> details;
     LocalDate createdAt;
 }

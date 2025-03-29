@@ -47,6 +47,17 @@ public enum ErrorCode {
     ROOM_NOT_FOUND(1081, "Phòng không tồn tại"),
     BUILDING_HAS_ROOMS(1082, "Không thể xóa dãy phòng (Dãy còn phòng)"),
     NAME_BUILDING_BLANK(1083, "Vui lòng nhập tên dãy phòng"),
+    BUILDING_NOT_NULL(1084, "Dãy phòng được để trống"),
+    ROOM_NUMBER_BLANK(1085, "Số phòng không được để trống"),
+    OCCUPANTS_INVALID(1085, "Số người không hợp lệ"),
+    ROOM_DO_NOT_DELETE(1086, "Không thể xóa phòng (Phòng đang có người thuê)"),
+
+    RENTER_NOT_FOUND(1090, " Người thuê không tồn tại"),
+
+    INVOICE_NOT_FOUND(1100, "Hóa đơn không tồn tại"),
+    RENTER_NOT_IN_ROOM(1101, "Người thuê không thuê phòng này"),
+    INVOICE_DETAIL_NOT_FOUND(1102, "Chi tiết hóa đơn không tồn tại"),
+
 
     ;
 

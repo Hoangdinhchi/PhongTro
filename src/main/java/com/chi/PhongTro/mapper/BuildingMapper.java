@@ -10,5 +10,8 @@ public interface BuildingMapper {
 
     @Mapping(target = "userId", source = "user.user_id")
     @Mapping(target = "userPhone", source = "user.phone")
+    @Mapping(target = "street", source = "street")
+    @Mapping(target = "district", source = "district")
+    @Mapping(target = "city", source = "city")
     BuildingResponse toBuildingResponse(Buildings building);
 }

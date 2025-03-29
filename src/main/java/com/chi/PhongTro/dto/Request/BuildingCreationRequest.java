@@ -13,5 +13,10 @@ public class BuildingCreationRequest {
 
     @NotBlank(message = "NAME_BUILDING_BLANK")
     String name;
+
+    String street;
+    String city;
+    String district;
+
     String description;
 }

@@ -5,10 +5,12 @@ import com.chi.PhongTro.dto.Request.UserCreationRequest;
 import com.chi.PhongTro.dto.Request.UserUpdateRequest;
 import com.chi.PhongTro.dto.Request.VerifyOtpRequest;
 import com.chi.PhongTro.dto.Response.UserResponse;
+import com.chi.PhongTro.entity.Renters;
 import com.chi.PhongTro.entity.Users;
 import com.chi.PhongTro.exception.AppException;
 import com.chi.PhongTro.exception.ErrorCode;
 import com.chi.PhongTro.mapper.UserMapper;
+import com.chi.PhongTro.repository.RenterRepository;
 import com.chi.PhongTro.repository.UsersRepository;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
@@ -30,7 +32,10 @@ import java.util.stream.Collectors;
 public class UserService {
 
     UsersRepository usersRepository;
+    RenterRepository renterRepository;
     UserMapper userMapper;
+
+
 
     OtpService otpService;
 
@@ -70,8 +75,8 @@ public class UserService {
 
         if(usersRepository.existsByEmail(request.getEmail()))
             throw new AppException(ErrorCode.EMAIL_EXISTED);
-
-        otpService.verifyOtp(request.getPhone(), request.getOtpCode());
+//TODO: verifyOtp
+//        otpService.verifyOtp(request.getPhone(), request.getOtpCode());
 
         Users users = userMapper.toUser(request);
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);

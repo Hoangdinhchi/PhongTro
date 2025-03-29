@@ -49,6 +49,9 @@ public class BuildingService {
                 .user(user)
                 .name(request.getName())
                 .description(request.getDescription())
+                .street(request.getStreet())
+                .city(request.getCity())
+                .district(request.getDistrict())
                 .createdAt(LocalDate.now())
                 .build();
 
@@ -91,6 +94,18 @@ public class BuildingService {
 
         if (request.getDescription() != null) {
             building.setDescription(request.getDescription());
+        }
+
+        if (request.getStreet() != null && !request.getStreet().isEmpty()) {
+            building.setStreet(request.getStreet());
+        }
+
+        if (request.getCity() != null && !request.getCity().isEmpty()) {
+            building.setCity(request.getCity());
+        }
+
+        if (request.getDistrict() != null && !request.getDistrict().isEmpty()) {
+            building.setDistrict(request.getDistrict());
         }
 
         building = buildingRepository.save(building);

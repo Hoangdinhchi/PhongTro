@@ -9,40 +9,32 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "buildings")
+@Table(name = "renters")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Buildings {
+public class Renters {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "building_id")
-    Long buildingId;
+    @Column(name = "renter_id")
+    Long renterId;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     Users user;
 
-    @Column(nullable = false)
-    String name;
-
-    String description;
+    @Column(name = "full_name", nullable = false)
+    String fullName;
 
     @Column(nullable = false)
-    String street;
+    String phone;
 
-    @Column(nullable = false)
-    String district;
+    String email;
 
-    @Column(nullable = false)
-    String city;
-
+    Boolean has_account;
 
     @Column(name = "created_at", nullable = false)
     LocalDate createdAt;
-
-    @OneToMany(mappedBy = "building", cascade = CascadeType.ALL, orphanRemoval = true)
-    List<Rooms> rooms = new ArrayList<>();
 }

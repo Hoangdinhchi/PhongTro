@@ -9,11 +9,11 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class BuildingUpdateRequest {
-    @NotBlank(message = "NAME_BUILDING_BLANK")
-    String name;
-    String street;
-    String district;
-    String city;
-    String description;
+public class RenterUpdateRequest {
+    @NotBlank(message = "FULL_NAME_BLANK")
+    String fullName;
+
+    @NotBlank(message = "PHONE_BLANK")
+    String phone;
+    String email;
 }
