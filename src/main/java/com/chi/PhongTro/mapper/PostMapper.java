@@ -13,7 +13,7 @@ public interface PostMapper {
     @Mapping(target = "user", ignore = true)
     @Mapping(target = "utilities", ignore = true)
     @Mapping(target = "status", ignore = true)
-    @Mapping(target = "created_at", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "view_count", ignore = true)
     @Mapping(target = "save_count", ignore = true)
     @Mapping(target = "media", ignore = true)
@@ -23,7 +23,7 @@ public interface PostMapper {
     @Mapping(target = "post_id", ignore = true) // Không cho phép cập nhật ID
     @Mapping(target = "user", ignore = true) // Không cho phép cập nhật user
     @Mapping(target = "status", ignore = true)
-    @Mapping(target = "created_at", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "view_count", ignore = true)
     @Mapping(target = "save_count", ignore = true)
     @Mapping(target = "media", ignore = true)

@@ -20,4 +20,6 @@ public class PostFilterRequest {
     Double maxArea;
     int page = 0;
     int size = 3;
+
+
 }

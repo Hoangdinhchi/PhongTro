@@ -8,6 +8,7 @@ import com.chi.PhongTro.dto.Request.PostUpdateRequest;
 import com.chi.PhongTro.dto.Response.PostResponse;
 import com.chi.PhongTro.entity.Media;
 import com.chi.PhongTro.entity.Posts;
+import com.chi.PhongTro.entity.Users;
 import com.chi.PhongTro.exception.AppException;
 import com.chi.PhongTro.exception.ErrorCode;
 import com.chi.PhongTro.mapper.PostMapper;
@@ -40,7 +41,6 @@ import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -60,6 +60,10 @@ public class PostService {
     @Value("${file.uploadDir}")
     String uploadDir;
 
+    @NonFinal
+    @Value("${file.base-url}")
+    String baseUrl;
+
     @Transactional
     @PreAuthorize("hasRole('ADMIN') || hasRole('OWNER')")
     public PostResponse createPost(PostCreationRequest request) throws IOException {
@@ -76,7 +80,9 @@ public class PostService {
                                 .orElseThrow(() -> new AppException(ErrorCode.UTILITY_NOT_EXISTED)))
                                 .collect(Collectors.toSet()));
         posts.setStatus("display");
-        posts.setCreated_at(LocalDate.now());
+        posts.setLatitude(request.getLatitude());
+        posts.setLongitude(request.getLongitude());
+        posts.setCreatedAt(LocalDate.now());
         posts.setView_count(0);
         posts.setSave_count(0);
 
@@ -88,7 +94,6 @@ public class PostService {
             savePost.setMedia(mediaList);
             mediaRepository.saveAll(mediaList);
         }
-
         return new PostResponse(savePost);
     }
 
@@ -160,7 +165,7 @@ public class PostService {
     private Media processFile(MultipartFile file, Posts post) throws IOException {
         validateFile(file);
         String fileName = saveFile(file);
-        String fileUrl = uploadDir + "/" + fileName;
+        String fileUrl = baseUrl + "/files/" + fileName;
         return Media.builder()
                 .post(post)
                 .file_url(fileUrl)
@@ -240,6 +245,22 @@ public class PostService {
                 .collect(Collectors.toList());
     }
 
+//    public PostResponse getPostById(String postId){
+//        return new PostResponse(postRepository.findById(postId)
+//                .orElseThrow(() -> new AppException(ErrorCode.POST_NOT_FOUND)));
+//    }
+
+    public List<PostResponse> getPostByUserId(){
+
+        var context = SecurityContextHolder.getContext().getAuthentication();
+        Users user = usersRepository.findByPhone(context.getName())
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+
+        return postRepository.findByUserId(user.getUser_id()).stream()
+                .map(PostResponse::new)
+                .collect(Collectors.toList());
+    }
+
     public PostResponse getPost(String postId){
 
         incrementViewCount(postId);
@@ -262,7 +283,7 @@ public class PostService {
         Pageable pageable = PageRequest.of(
                 request.getPage(),
                 request.getSize(),
-                Sort.by("created_at").descending()
+                Sort.by("createdAt").descending()
         );
 
         Page<Posts> postsPage = postRepository.findAll(spec, pageable);

@@ -35,6 +35,9 @@ public class PostUpdateRequest {
     @NotBlank(message = "POST_DISTRICT_BLANK")
     private String district;
 
+    Double latitude;
+    Double longitude;
+
     @NotNull(message = "POST_PRICE_INVALID")
     @Positive(message = "POST_PRICE_INVALID")
     private Double price;

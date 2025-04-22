@@ -23,6 +23,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -81,6 +82,7 @@ public class UserService {
         Users users = userMapper.toUser(request);
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
         users.setPassword(passwordEncoder.encode(request.getPassword()));
+        users.setCreated_at(LocalDate.now());
         return userMapper.toUserReponse(usersRepository.save(users));
     }
 

@@ -31,19 +31,36 @@ public class PostController {
         return apiResponse;
     }
 
-    @GetMapping
-    ApiResponse<List<PostResponse>> getAllPost(){
+//    @GetMapping
+//    ApiResponse<List<PostResponse>> getAllPost(){
+//        ApiResponse<List<PostResponse>> apiResponse = new ApiResponse<>();
+//        apiResponse.setResult(postService.getAllPost());
+//        return apiResponse;
+//    }
+
+    @GetMapping("/{postId}")
+    ApiResponse<PostResponse> getPostById(@PathVariable String postId){
+        return ApiResponse.<PostResponse>builder()
+                .code(1000)
+                .result(postService.getPost(postId))
+                .build();
+
+    }
+
+
+    @GetMapping("/my_post")
+    ApiResponse<List<PostResponse>> getMyPost(){
         ApiResponse<List<PostResponse>> apiResponse = new ApiResponse<>();
-        apiResponse.setResult(postService.getAllPost());
+        apiResponse.setResult(postService.getPostByUserId());
         return apiResponse;
     }
 
-//    @GetMapping
-//    ApiResponse<Page<PostResponse>> getPosts(PostFilterRequest request){
-//        return ApiResponse.<Page<PostResponse>>builder()
-//                .result(postService.getPostsWithFilter(request))
-//                .build();
-//    }
+    @GetMapping
+    ApiResponse<Page<PostResponse>> getPosts(@ModelAttribute PostFilterRequest request){
+        return ApiResponse.<Page<PostResponse>>builder()
+                .result(postService.getPostsWithFilter(request))
+                .build();
+    }
 
     @DeleteMapping("/{postId}")
     ApiResponse<String> deletePost(@PathVariable String postId){

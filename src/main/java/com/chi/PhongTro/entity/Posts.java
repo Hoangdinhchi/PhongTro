@@ -36,6 +36,9 @@ public class Posts {
     String address;
     String city;
     String district;
+    Double latitude;
+    Double longitude;
+
     Double price;
     Double area;
 
@@ -54,7 +57,9 @@ public class Posts {
     private List<Reports> reports = new ArrayList<>();
 
     String status;
-    LocalDate created_at;
+    @Column(name = "created_at")
+    LocalDate createdAt;
+
 
     int view_count;
     int save_count;
