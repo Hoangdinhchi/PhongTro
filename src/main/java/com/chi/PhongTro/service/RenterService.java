@@ -69,6 +69,10 @@ public class RenterService {
                 .collect(Collectors.toList());
     }
 
+    public List<RenterResponse> getAllMyRenters() {
+        var context = SecurityContextHolder.getContext()
+    }
+
 
     @PreAuthorize("hasRole('ADMIN') || hasRole('OWNER')")
     public RenterResponse getRenterById(String renterId) {
