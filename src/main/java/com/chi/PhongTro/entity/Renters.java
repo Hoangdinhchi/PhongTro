@@ -35,6 +35,10 @@ public class Renters {
 
     Boolean has_account;
 
+    @OneToMany(mappedBy = "renter", cascade = CascadeType.ALL, orphanRemoval = true)
+    List<RoomRenters> roomRenters = new ArrayList<>();
+
+
     @Column(name = "created_at", nullable = false)
     LocalDate createdAt;
 }

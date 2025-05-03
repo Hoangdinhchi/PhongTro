@@ -137,7 +137,7 @@ public class AuthenticationService {
                 return jwsObject.serialize();
         }catch (JOSEException e)
         {
-            log.error("Không thể tạo token ", e);
+
             throw new RuntimeException(e);
         }
     }

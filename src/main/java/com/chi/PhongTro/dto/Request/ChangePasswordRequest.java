@@ -1,25 +1,23 @@
 package com.chi.PhongTro.dto.Request;
 
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class RenterCreationRequest {
+public class ChangePasswordRequest {
 
-    @NotBlank(message = "FULL_NAME_BLANK")
-    String fullName;
+    @NotNull(message = "OLD_PASSWORD_NULL")
+    String oldPassword;
 
-    @NotBlank(message = "PHONE_BLANK")
-    String phone;
-
-    String email;
+    @NotBlank(message = "NEW_PASSWORD_BLANK")
+    @Size(min = 6, message = "PASSWORD_INVALID")
+    String newPassword;
 }

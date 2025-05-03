@@ -14,10 +14,11 @@ import java.util.List;
 public class RenterResponse {
     Long renterId;
     Long userId;
-    String avatar;
     String fullName;
     String phone;
     String email;
+    List<String>  roomNames;
     Boolean has_account;
     LocalDate createdAt;
+
 }

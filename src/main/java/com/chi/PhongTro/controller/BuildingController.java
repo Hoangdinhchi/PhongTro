@@ -55,5 +55,13 @@ public class BuildingController {
                 .build();
     }
 
+    @GetMapping("/{buildingId}")
+    ApiResponse<BuildingResponse> getBuildingById(@PathVariable String buildingId){
+        return ApiResponse.<BuildingResponse>builder()
+                .code(1000)
+                .result(buildingService.getBuildingById(buildingId))
+                .build();
+    }
+
 
 }

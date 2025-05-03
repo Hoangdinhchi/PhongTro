@@ -2,6 +2,7 @@ package com.chi.PhongTro.controller;
 
 
 import com.chi.PhongTro.dto.Request.*;
+import com.chi.PhongTro.dto.Response.PageResponse;
 import com.chi.PhongTro.dto.Response.PostResponse;
 import com.chi.PhongTro.service.PostService;
 import jakarta.validation.Valid;
@@ -55,9 +56,11 @@ public class PostController {
         return apiResponse;
     }
 
+
+
     @GetMapping
-    ApiResponse<Page<PostResponse>> getPosts(@ModelAttribute PostFilterRequest request){
-        return ApiResponse.<Page<PostResponse>>builder()
+    ApiResponse<PageResponse<PostResponse>> getPosts(@ModelAttribute PostFilterRequest request){
+        return ApiResponse.<PageResponse<PostResponse>>builder()
                 .result(postService.getPostsWithFilter(request))
                 .build();
     }

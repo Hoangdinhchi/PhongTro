@@ -1,25 +1,26 @@
 package com.chi.PhongTro.dto.Request;
 
-import jakarta.validation.constraints.NotBlank;
+
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class RenterCreationRequest {
+public class RoomRenterCreationRequest {
 
-    @NotBlank(message = "FULL_NAME_BLANK")
-    String fullName;
+    @NotNull(message = "ROOM_ID_NULL")
+    String roomId;
 
-    @NotBlank(message = "PHONE_BLANK")
-    String phone;
+    @NotNull(message = "RENTER_ID_NULL")
+    String renterId;
 
-    String email;
+    LocalDate startDate;
+    LocalDate endDate;
+
 }

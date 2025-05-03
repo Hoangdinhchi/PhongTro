@@ -46,6 +46,14 @@ public class RoomController {
                 .build();
     }
 
+    @GetMapping("/my-room")
+    public ApiResponse<List<RoomResponse>> getAllMyRoom(){
+        return ApiResponse.<List<RoomResponse>>builder()
+                .code(1000)
+                .result(roomService.getAllRoomsOfUser())
+                .build();
+    }
+
     @GetMapping("/{roomId}")
     public ApiResponse<RoomResponse> getRoomById(@PathVariable String roomId){
         return ApiResponse.<RoomResponse>builder()
@@ -71,26 +79,26 @@ public class RoomController {
                 .result("Đã xóa phòng")
                 .build();
     }
+//
+//    @PostMapping("/{roomId}/renters/{renterId}")
+//    public ApiResponse<RoomResponse> addRenterToRoom(
+//            @PathVariable String roomId,
+//            @PathVariable String renterId){
+//        return ApiResponse.<RoomResponse>builder()
+//                .code(1000)
+//                .result(roomService.addRenterToRoom(roomId, renterId))
+//                .build();
+//    }
 
-    @PostMapping("/{roomId}/renters/{renterId}")
-    public ApiResponse<RoomResponse> addRenterToRoom(
-            @PathVariable String roomId,
-            @PathVariable String renterId){
-        return ApiResponse.<RoomResponse>builder()
-                .code(1000)
-                .result(roomService.addRenterToRoom(roomId, renterId))
-                .build();
-    }
-
-    @DeleteMapping("/{roomId}/renters/{renterId}")
-    public ApiResponse<RoomResponse> removeRenterFromRoom(
-            @PathVariable String roomId,
-            @PathVariable String renterId){
-        return ApiResponse.<RoomResponse>builder()
-                .code(1000)
-                .result(roomService.removeRenterFromRoom(roomId, renterId))
-                .build();
-    }
+//    @DeleteMapping("/{roomId}/renters/{renterId}")
+//    public ApiResponse<RoomResponse> removeRenterFromRoom(
+//            @PathVariable String roomId,
+//            @PathVariable String renterId){
+//        return ApiResponse.<RoomResponse>builder()
+//                .code(1000)
+//                .result(roomService.removeRenterFromRoom(roomId, renterId))
+//                .build();
+//    }
 
 
 }

@@ -31,18 +31,13 @@ public class Rooms {
     @Column(nullable = false)
     String status;
 
-    private Integer occupants;
+    Integer occupants;
 
     @Column(nullable = false)
     Double price;
 
-    @ManyToMany
-    @JoinTable(
-            name = "room_renters",
-            joinColumns = @JoinColumn( name = "room_id"),
-            inverseJoinColumns = @JoinColumn( name = "renter_id")
-    )
-    List<Renters> renters = new ArrayList<>();
+    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
+    List<RoomRenters> roomRenters = new ArrayList<>();
 
     @Column(name = "created_at", nullable = false)
     LocalDate createdAt;

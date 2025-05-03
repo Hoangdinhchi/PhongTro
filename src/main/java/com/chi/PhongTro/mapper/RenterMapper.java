@@ -9,6 +9,6 @@ import org.mapstruct.Mapping;
 public interface RenterMapper {
 
     @Mapping(target = "userId", source = "user.user_id")
-    @Mapping(target = "avatar", source = "user.avatar")
+    @Mapping(target = "roomNames", ignore = true)
     RenterResponse toRenterResponse(Renters renter);
 }

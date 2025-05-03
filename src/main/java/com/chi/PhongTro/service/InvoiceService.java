@@ -69,8 +69,14 @@ public class InvoiceService {
             throw new AppException(ErrorCode.INVALID_STATUS);
         }
 
+        boolean isRenterInRoom = renter.getRoomRenters().stream()
+                .anyMatch(roomRenter -> {
+                    return roomRenter.getRenter().getRenterId().equals(renter.getRenterId())
+                    && (roomRenter.getEndDate() == null || roomRenter.getEndDate().isAfter(LocalDate.now()));
+                });
+
         // Kiểm tra xem renter có đang thuê phòng này không
-        if (!room.getRenters().contains(renter)) {
+        if (!isRenterInRoom) {
             throw new AppException(ErrorCode.RENTER_NOT_IN_ROOM);
         }
 
@@ -143,6 +149,14 @@ public class InvoiceService {
     // Lấy tất cả hóa đơn (public)
     public List<InvoiceResponse> getAllInvoices() {
         List<Invoices> invoices = invoiceRepository.findAll();
+        return invoices.stream()
+                .map(invoiceMapper::toInvoiceResponse)
+                .collect(Collectors.toList());
+    }
+
+    public List<InvoiceResponse> getAllInvoicesByOwner() {
+        var context = SecurityContextHolder.getContext();
+        List<Invoices> invoices = invoiceRepository.findAllByOwnerPhone(context.getAuthentication().getName());
         return invoices.stream()
                 .map(invoiceMapper::toInvoiceResponse)
                 .collect(Collectors.toList());

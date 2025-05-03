@@ -4,20 +4,17 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class RoomResponse {
-    Long roomId;
-    Long buildingId;
-    String buildingName;
-    String roomNumber;
-    String status;
-    Integer occupants;
-    Double price;
-    LocalDate createdAt;
+public class WaterResponse {
+    Long id;
+    double level_1;
+    double level_2;
+    double level_3;
+    double level_4;
+    LocalDate create_at;
 }

@@ -14,6 +14,9 @@ public enum ErrorCode {
     USER_NOT_EXISTED(1010, "Người dùng không tồn tại"),
     PHONE_NOT_EXISTED(1011, "Số điện thoại không tồn tại"),
     UNAUTHENTICATED(1012, "Xác thực không thành công"),
+    WRONG_PASSWORD(1013, "Mật khẩu hiện tại không đúng"),
+    OLD_PASSWORD_NULL(1014, "Vui lòng nhập mật khẩu cũ"),
+    NEW_PASSWORD_BLANK(1014, "Mật khẩu mới không được để trống"),
 
     ROOM_TYPE_NOT_EXISTED(1031, "Loại phòng không tồn tại"),
     UTILITY_NOT_EXISTED(1032, "Tiện ích không tồn tại"),
@@ -45,7 +48,7 @@ public enum ErrorCode {
 
     BUILDING_NOT_FOUND(1080, "Dãy phòng không tồn tại"),
     ROOM_NOT_FOUND(1081, "Phòng không tồn tại"),
-    BUILDING_HAS_ROOMS(1082, "Không thể xóa dãy phòng (Dãy còn phòng)"),
+    BUILDING_HAS_ROOMS(1082, "Không thể xóa dãy phòng (Dãy còn phòng đang cho thuê)"),
     NAME_BUILDING_BLANK(1083, "Vui lòng nhập tên dãy phòng"),
     BUILDING_NOT_NULL(1084, "Dãy phòng được để trống"),
     ROOM_NUMBER_BLANK(1085, "Số phòng không được để trống"),
@@ -57,6 +60,10 @@ public enum ErrorCode {
     INVOICE_NOT_FOUND(1100, "Hóa đơn không tồn tại"),
     RENTER_NOT_IN_ROOM(1101, "Người thuê không thuê phòng này"),
     INVOICE_DETAIL_NOT_FOUND(1102, "Chi tiết hóa đơn không tồn tại"),
+
+    ROOM_ID_NULL(1110, "Mã phòng không được trống"),
+    RENTER_ID_NULL(1111, "Mã người thuê không được trống"),
+    ROOM_RENTER_NOT_FOUND(1112, "Thông tin thuê phòng không tồn tại"),
 
 
     ;

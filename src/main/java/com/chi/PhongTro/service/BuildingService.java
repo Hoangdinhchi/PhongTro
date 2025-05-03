@@ -4,6 +4,7 @@ import com.chi.PhongTro.dto.Request.BuildingCreationRequest;
 import com.chi.PhongTro.dto.Request.BuildingUpdateRequest;
 import com.chi.PhongTro.dto.Response.BuildingResponse;
 import com.chi.PhongTro.entity.Buildings;
+import com.chi.PhongTro.entity.Rooms;
 import com.chi.PhongTro.entity.Users;
 import com.chi.PhongTro.exception.AppException;
 import com.chi.PhongTro.exception.ErrorCode;
@@ -112,14 +113,29 @@ public class BuildingService {
         return buildingMapper.toBuildingResponse(building);
     }
 
+
+    public void confirmDelete(String buildingId) {
+        Buildings building = buildingRepository.findById(buildingId)
+                .orElseThrow(() -> new AppException(ErrorCode.BUILDING_NOT_FOUND));
+        buildingRepository.delete(building);
+    }
+
     @Transactional
     @PreAuthorize("@buildingService.checkBuildingPermission(#buildingId, authentication)")
     public void deleteBuilding(String buildingId) {
         Buildings building = buildingRepository.findById(buildingId)
                 .orElseThrow(() -> new AppException(ErrorCode.BUILDING_NOT_FOUND));
-        if (!building.getRooms().isEmpty()) {
+        List<Rooms> rooms = building.getRooms();
+
+        // Kiểm tra xem có phòng nào đang được thuê không
+        boolean hasRentedRooms = rooms.stream()
+                .anyMatch(room -> !"available".equals(room.getStatus()));
+
+        if (hasRentedRooms) {
             throw new AppException(ErrorCode.BUILDING_HAS_ROOMS);
         }
+
+
         buildingRepository.delete(building);
     }
 

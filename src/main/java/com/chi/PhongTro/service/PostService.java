@@ -5,6 +5,7 @@ import com.chi.PhongTro.dto.Request.PostCreationRequest;
 import com.chi.PhongTro.dto.Request.PostFilterRequest;
 import com.chi.PhongTro.dto.Request.PostStatusUpdateRequest;
 import com.chi.PhongTro.dto.Request.PostUpdateRequest;
+import com.chi.PhongTro.dto.Response.PageResponse;
 import com.chi.PhongTro.dto.Response.PostResponse;
 import com.chi.PhongTro.entity.Media;
 import com.chi.PhongTro.entity.Posts;
@@ -268,7 +269,8 @@ public class PostService {
                 .orElseThrow(() -> new AppException(ErrorCode.POST_NOT_FOUND)));
     }
 
-    public Page<PostResponse> getPostsWithFilter(PostFilterRequest request) {
+
+    public PageResponse<PostResponse> getPostsWithFilter(PostFilterRequest request) {
         Specification<Posts> spec = PostSpecification.filterPost(
                 request.getTypeId(),
                 request.getCity(),
@@ -285,9 +287,10 @@ public class PostService {
                 request.getSize(),
                 Sort.by("createdAt").descending()
         );
-
         Page<Posts> postsPage = postRepository.findAll(spec, pageable);
-        return postsPage.map(PostResponse::new);
+        Page<PostResponse> responsePage = postsPage.map(PostResponse::new);
+
+        return new PageResponse<>(responsePage);
     }
 
     @PreAuthorize("@postService.checkDeletePermission(#postId, authentication)")
@@ -301,6 +304,8 @@ public class PostService {
         post.setStatus(request.getStatus());
         postRepository.save(post);
     }
+
+
 
     @Transactional
     @PreAuthorize("@postService.checkDeletePermission(#postId, authentication)")

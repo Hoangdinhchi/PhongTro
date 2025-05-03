@@ -1,9 +1,6 @@
 package com.chi.PhongTro.service;
 
-import com.chi.PhongTro.dto.Request.RegisterRequest;
-import com.chi.PhongTro.dto.Request.UserCreationRequest;
-import com.chi.PhongTro.dto.Request.UserUpdateRequest;
-import com.chi.PhongTro.dto.Request.VerifyOtpRequest;
+import com.chi.PhongTro.dto.Request.*;
 import com.chi.PhongTro.dto.Response.UserResponse;
 import com.chi.PhongTro.entity.Renters;
 import com.chi.PhongTro.entity.Users;
@@ -18,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -35,7 +33,6 @@ public class UserService {
     UsersRepository usersRepository;
     RenterRepository renterRepository;
     UserMapper userMapper;
-
 
 
     OtpService otpService;
@@ -68,13 +65,12 @@ public class UserService {
     }
 
     @Transactional
-    public UserResponse createRequest(UserCreationRequest request)
-    {
+    public UserResponse createRequest(UserCreationRequest request) {
 
-        if(usersRepository.existsByPhone(request.getPhone()))
+        if (usersRepository.existsByPhone(request.getPhone()))
             throw new AppException(ErrorCode.PHONE_EXISTED);
 
-        if(usersRepository.existsByEmail(request.getEmail()))
+        if (usersRepository.existsByEmail(request.getEmail()))
             throw new AppException(ErrorCode.EMAIL_EXISTED);
 //TODO: verifyOtp
 //        otpService.verifyOtp(request.getPhone(), request.getOtpCode());
@@ -87,7 +83,7 @@ public class UserService {
     }
 
 
-    public UserResponse getMyInfo(){
+    public UserResponse getMyInfo() {
         var context = SecurityContextHolder.getContext();
 
         Users users = usersRepository.findByPhone(context.getAuthentication().getName()).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
@@ -98,7 +94,7 @@ public class UserService {
 
 
     @PreAuthorize("hasRole('ADMIN')")
-    public List<UserResponse> getUser(){
+    public List<UserResponse> getUser() {
         List<Users> users = usersRepository.findAll();
         return users.stream()
                 .map(userMapper::toUserReponse)
@@ -107,7 +103,7 @@ public class UserService {
 
 
     @PreAuthorize("hasRole('ADMIN')")
-    public void deleteUser(String userid){
+    public void deleteUser(String userid) {
         usersRepository.deleteById(userid);
     }
 
@@ -115,7 +111,7 @@ public class UserService {
     public UserResponse updateUser(UserUpdateRequest request, String userid) {
         Users users = usersRepository.findById(userid)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-        userMapper.updateUser(users,request);
+        userMapper.updateUser(users, request);
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
         users.setPassword(passwordEncoder.encode(request.getPassword()));
 
@@ -123,9 +119,23 @@ public class UserService {
 
     }
 
+    @Transactional
+    public boolean changePassword(ChangePasswordRequest request) {
+        var context = SecurityContextHolder.getContext();
+        Users users = usersRepository.findByPhone(context.getAuthentication().getName())
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
+        boolean authenticated = passwordEncoder.matches(request.getOldPassword(), users.getPassword());
+        if (!authenticated)
+            throw new AppException(ErrorCode.WRONG_PASSWORD);
+        users.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        usersRepository.save(users);
+        return true;
+    }
+
 
     @PostAuthorize("returnObject.phone == authentication.name || hasRole('ADMIN')")
-    public UserResponse getUser(String userId){
+    public UserResponse getUser(String userId) {
         return userMapper.toUserReponse(usersRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED)));
     }
 }

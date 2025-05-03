@@ -8,10 +8,9 @@ import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 
 @RestController
@@ -31,7 +30,21 @@ public class InvoiceController {
 
     }
 
+    @GetMapping("/my-invoices")
+    ApiResponse<List<InvoiceResponse>> getAllInvoicesByOwner(){
+        return ApiResponse.<List<InvoiceResponse>>builder()
+                .code(1000)
+                .result(invoiceService.getAllInvoicesByOwner())
+                .build();
+    }
 
+    @GetMapping("/{invoiceId}")
+    ApiResponse<InvoiceResponse> getInvoiceById(@PathVariable String invoiceId){
+        return ApiResponse.<InvoiceResponse>builder()
+                .code(1000)
+                .result(invoiceService.getInvoiceById(invoiceId))
+                .build();
+    }
 
-
+    
 }

@@ -17,7 +17,7 @@ public class PostSpecification {
 
             if (typeId != null && !typeId.isEmpty()) {
                 Join<Posts, RoomTypes> typeJoin = root.join("type");
-                predicates.add(cb.equal(typeJoin.get("typeId"), typeId));
+                predicates.add(cb.equal(typeJoin.get("type_id"), typeId));
             }
 
 

@@ -1,14 +1,12 @@
 package com.chi.PhongTro.controller;
 
+import com.chi.PhongTro.dto.Request.ApiResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.net.MalformedURLException;
 import java.nio.file.Path;
@@ -21,17 +19,17 @@ public class FileController {
     @Value("${file.uploadDir}")
     String uploadDir;
 
-
-    @GetMapping("/{filename:.+}")
+    @GetMapping(value = "/{filename:.+}", produces = {
+            MediaType.IMAGE_JPEG_VALUE,
+            MediaType.IMAGE_PNG_VALUE,
+            "video/mp4"
+    })
     public ResponseEntity<Resource> serveFile(@PathVariable String filename) {
         try {
-            // Xây dựng đường dẫn file
             Path filePath = Paths.get(uploadDir).resolve(filename).normalize();
             Resource resource = new UrlResource(filePath.toUri());
 
-            // Kiểm tra file có tồn tại và có thể đọc không
             if (resource.exists() && resource.isReadable()) {
-                // Xác định content type (image/jpeg, image/png, v.v.)
                 String contentType = "application/octet-stream";
                 if (filename.endsWith(".jpg") || filename.endsWith(".jpeg")) {
                     contentType = MediaType.IMAGE_JPEG_VALUE;
@@ -45,10 +43,11 @@ public class FileController {
                         .contentType(MediaType.parseMediaType(contentType))
                         .body(resource);
             } else {
-                return ResponseEntity.notFound().build();
+                return ResponseEntity.notFound()
+                        .build();
             }
         } catch (MalformedURLException e) {
-            return ResponseEntity.badRequest().build();
+            throw new RuntimeException("Invalid file URL: " + e.getMessage(), e);
         }
     }
 }

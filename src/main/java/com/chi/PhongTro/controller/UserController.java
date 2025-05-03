@@ -1,20 +1,19 @@
 package com.chi.PhongTro.controller;
 
-import com.chi.PhongTro.dto.Request.ApiResponse;
-import com.chi.PhongTro.dto.Request.RegisterRequest;
-import com.chi.PhongTro.dto.Request.UserCreationRequest;
-import com.chi.PhongTro.dto.Request.UserUpdateRequest;
+import com.chi.PhongTro.dto.Request.*;
 import com.chi.PhongTro.dto.Response.UserResponse;
 import com.chi.PhongTro.service.UserService;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor
@@ -44,6 +43,19 @@ public class UserController {
         apiResponse.setResult(userService.updateUser(request,userId));
 
         return apiResponse;
+    }
+
+    @PatchMapping("/change-password")
+    ApiResponse<String> changePassword(@RequestBody @Valid ChangePasswordRequest request){
+
+        boolean result = true;
+        if(!userService.changePassword(request)){
+            result = false;
+        };
+        return ApiResponse.<String>builder()
+                .code(1000)
+                .result(result ? "Đổi mật khẩu thành công" : "Lỗi trong quá trình đổi mật khẩu")
+                .build();
     }
 
     @GetMapping

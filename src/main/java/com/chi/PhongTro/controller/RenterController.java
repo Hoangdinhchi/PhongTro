@@ -32,7 +32,7 @@ public class RenterController {
     ApiResponse<List<RenterResponse>> getAllMyRenter(){
         return ApiResponse.<List<RenterResponse>>builder()
                 .code(1000)
-                .result(renterService.getAllRenters())
+                .result(renterService.getAllMyRenters())
                 .build();
     }
 

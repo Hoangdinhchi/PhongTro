@@ -23,6 +23,8 @@ public class Users {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     long user_id;
+
+
     String username;
     String password;
     String email;

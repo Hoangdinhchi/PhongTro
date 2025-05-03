@@ -15,6 +15,7 @@ import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -22,8 +23,10 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -48,6 +51,11 @@ public class RenterService {
         if (usersRepository.existsByPhone(request.getPhone()))
             has_account = true;
 
+        if(renterRepository.existsByUserIdAndPhone(user.getUser_id(), request.getPhone()))
+            throw new AppException(ErrorCode.PHONE_EXISTED);
+        if (renterRepository.exitsByUserIdAndEmail(user.getUser_id(), request.getEmail()))
+            throw new AppException(ErrorCode.EMAIL_EXISTED);
+
         Renters renter = Renters.builder()
                 .user(user)
                 .fullName(request.getFullName())
@@ -58,27 +66,49 @@ public class RenterService {
                 .build();
 
         renter = renterRepository.save(renter);
-        return renterMapper.toRenterResponse(renter);
+        RenterResponse response = renterMapper.toRenterResponse(renter);
+        Optional.ofNullable(renter.getRoomRenters())
+                .ifPresent(roomRenters -> {
+                    List<String> roomNames = roomRenters.stream()
+                            .map(roomRenter -> roomRenter.getRoom().getRoomNumber())
+                            .collect(Collectors.toList());
+                    response.setRoomNames(roomNames);
+                });
+        return response;
     }
 
-    @PreAuthorize("hasRole('ADMIN') || hasRole('OWNER')")
+    @PreAuthorize("hasRole('ADMIN')")
     public List<RenterResponse> getAllRenters() {
         List<Renters> renters = renterRepository.findAll();
         return renters.stream()
-                .map(renterMapper::toRenterResponse)
+                .map(this::toRenterResponse)
                 .collect(Collectors.toList());
     }
 
     public List<RenterResponse> getAllMyRenters() {
-        var context = SecurityContextHolder.getContext()
+        var context = SecurityContextHolder.getContext();
+        Users user = usersRepository.findByPhone(context.getAuthentication().getName())
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        List<Renters> renters = renterRepository.findByUserId(user.getUser_id());
+        return renters.stream()
+                .map(this::toRenterResponse)
+                .collect(Collectors.toList());
     }
 
 
-    @PreAuthorize("hasRole('ADMIN') || hasRole('OWNER')")
+    @PreAuthorize("@renterService.checkRenterPermission(#renterId, authentication)")
     public RenterResponse getRenterById(String renterId) {
         Renters renter = renterRepository.findById(renterId)
                 .orElseThrow(() -> new AppException(ErrorCode.RENTER_NOT_FOUND));
-        return renterMapper.toRenterResponse(renter);
+        RenterResponse response = renterMapper.toRenterResponse(renter);
+        Optional.ofNullable(renter.getRoomRenters())
+                .ifPresent(roomRenters -> {
+                    List<String> roomNames = roomRenters.stream()
+                            .map(roomRenter -> roomRenter.getRoom().getRoomNumber())
+                            .collect(Collectors.toList());
+                    response.setRoomNames(roomNames);
+                });
+        return response;
     }
 
 
@@ -93,15 +123,33 @@ public class RenterService {
         }
 
         if (request.getPhone() != null && !request.getPhone().isEmpty()) {
+            if (renter.getPhone() != null && !renter.getPhone().equals(request.getPhone())) {
+                if(renterRepository.existsByUserIdAndPhone(renter.getUser().getUser_id(), request.getPhone()))
+                    throw new AppException(ErrorCode.PHONE_EXISTED);
+            }
             renter.setPhone(request.getPhone());
         }
 
         if (request.getEmail() != null) {
+            if (renter.getEmail() != null && !renter.getEmail().equals(request.getEmail())) {
+                if (renterRepository.exitsByUserIdAndEmail(renter.getUser().getUser_id(), request.getEmail())){
+                    throw new AppException(ErrorCode.EMAIL_EXISTED);
+                }
+            }
             renter.setEmail(request.getEmail());
         }
 
+
         renter = renterRepository.save(renter);
-        return renterMapper.toRenterResponse(renter);
+        RenterResponse response = renterMapper.toRenterResponse(renter);
+        Optional.ofNullable(renter.getRoomRenters())
+                .ifPresent(roomRenters -> {
+                    List<String> roomNames = roomRenters.stream()
+                            .map(roomRenter -> roomRenter.getRoom().getRoomNumber())
+                            .collect(Collectors.toList());
+                    response.setRoomNames(roomNames);
+                });
+        return response;
     }
 
 
@@ -126,6 +174,20 @@ public class RenterService {
         boolean isCreator = renter.getUser().getPhone().equals(currentUserPhone);
 
         return isAdmin || isCreator;
+    }
+
+
+    private RenterResponse toRenterResponse(Renters renter) {
+        RenterResponse response = renterMapper.toRenterResponse(renter);
+        Optional.ofNullable(renter.getRoomRenters())
+                .ifPresent(roomRenters -> {
+                    List<String> roomNames = roomRenters.stream()
+                            .map(roomRenter -> roomRenter.getRoom().getRoomNumber())
+                            .collect(Collectors.toList());
+                    response.setRoomNames(roomNames);
+                });
+        return response;
+
     }
 
 }
