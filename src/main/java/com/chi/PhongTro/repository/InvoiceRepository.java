@@ -13,4 +13,13 @@ public interface InvoiceRepository extends JpaRepository<Invoices, String> {
 
     @Query("SELECT i FROM Invoices i WHERE i.owner.phone = :phone")
     List<Invoices> findAllByOwnerPhone(@Param("phone") String phone);
+
+    @Query("SELECT i FROM Invoices i WHERE i.renter.phone = :phone")
+    List<Invoices> findAllByRenterPhone(String phone);
+
+    @Query("SELECT i FROM Invoices i WHERE i.room.roomId = :roomId")
+    List<Invoices> findAllByRoomId(String roomId);
+
+    @Query("SELECT i FROM Invoices i WHERE i.room.roomId = :roomId AND i.renter.phone = :renterPhone")
+    List<Invoices> findAllByRoomIdAndRenterPhone(String roomId, String renterPhone);
 }

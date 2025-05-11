@@ -1,5 +1,6 @@
 package com.chi.PhongTro.dto.Request;
 
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -8,10 +9,6 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ReportCreationRequest {
-    String toUserId;
-    String reportedId;
-    String reason;
-    String content;
-    String typeReportId;
+public class InvoiceUpdateStatusRequest {
+    String status;
 }

@@ -18,4 +18,7 @@ public interface RoomRenterRepository extends JpaRepository<RoomRenters, String>
     @Query("SELECT r FROM RoomRenters r WHERE r.renter.renterId = :renterId")
     List<RoomRenters> findAllByRenterId(String renterId);
 
+    @Query("SELECT r FROM RoomRenters r WHERE r.renter.phone = :phone")
+    List<RoomRenters> findAllByRenterPhone(String phone);
+
 }

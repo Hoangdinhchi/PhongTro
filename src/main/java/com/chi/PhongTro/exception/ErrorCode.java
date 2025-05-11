@@ -65,6 +65,7 @@ public enum ErrorCode {
     RENTER_ID_NULL(1111, "Mã người thuê không được trống"),
     ROOM_RENTER_NOT_FOUND(1112, "Thông tin thuê phòng không tồn tại"),
 
+    TYPE_REPORT_NOT_EXISTED(1113, "Loại báo cáo không phù hợp")
 
     ;
 

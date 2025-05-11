@@ -23,7 +23,12 @@ public class RoomRenterResponse {
         this.roomRenterId = roomRenters.getId();
         this.room = new roomDTO(roomRenters.getRoom().getRoomId(),
                 roomRenters.getRoom().getRoomNumber(),
-                roomRenters.getRoom().getBuilding().getName());
+                roomRenters.getRoom().getBuilding().getName(),
+                roomRenters.getRoom().getBuilding().getUser().getUsername(),
+                roomRenters.getRoom().getBuilding().getUser().getPhone(),
+                roomRenters.getRoom().getBuilding().getStreet(),
+                roomRenters.getRoom().getBuilding().getDistrict(),
+                roomRenters.getRoom().getBuilding().getCity());
         this.renter = new renterDTO(roomRenters.getRenter().getRenterId(),
                 roomRenters.getRenter().getFullName(),
                 roomRenters.getRenter().getPhone());
@@ -40,6 +45,11 @@ public class RoomRenterResponse {
         long room_id;
         String roomNumber;
         String buildingName;
+        String owner_name;
+        String owner_phone;
+        String address;
+        String district;
+        String city;
     }
 
 

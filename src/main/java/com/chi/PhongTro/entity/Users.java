@@ -31,11 +31,7 @@ public class Users {
     String phone;
     String avatar;
 
-    @OneToMany(mappedBy = "reporter", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Reports> reportsAsReporter = new ArrayList<>();
 
-    @OneToMany(mappedBy = "reportedUser", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Reports> reportsAsReportedUser = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Buildings> buildings = new ArrayList<>();

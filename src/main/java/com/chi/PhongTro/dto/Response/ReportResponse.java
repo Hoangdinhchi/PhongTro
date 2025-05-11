@@ -1,5 +1,6 @@
 package com.chi.PhongTro.dto.Response;
 
+import com.chi.PhongTro.entity.TypeReports;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -14,10 +15,12 @@ public class ReportResponse {
     Long reportId;
     Long reporterId;
     String reporterPhone;
-    Long reportedUserId;
-    String reportedUserPhone;
-    Long postId;
+    Long toUserId;
+    String toUserPhone;
+    Long reportedId;
+    TypeReports typeReport;
     String reason;
+    String content;
     String status;
     LocalDate createdAt;
 }

@@ -42,6 +42,21 @@ public class ReportController {
                 .build();
     }
 
+    @GetMapping("/reporters")
+    public ApiResponse<List<ReportResponse>> getAllReportsByReporter() {
+        return ApiResponse.<List<ReportResponse>>builder()
+                .code(1000)
+                .result(reportService.getReportsByReporter())
+                .build();
+    }
+
+    @GetMapping("/to-user")
+    public ApiResponse<List<ReportResponse>> getAllReportsByToUser() {
+        return ApiResponse.<List<ReportResponse>>builder()
+                .code(1000)
+                .result(reportService.getReportsByToUser ())
+                .build();
+    }
 
     @PutMapping("/{reportId}")
     public ApiResponse<ReportResponse> updateReport(

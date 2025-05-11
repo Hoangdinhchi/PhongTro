@@ -24,15 +24,22 @@ public class Reports {
     Users reporter;
 
     @ManyToOne
-    @JoinColumn(name = "reported_user_id", nullable = false)
-    Users reportedUser;
+    @JoinColumn(name = "to_user_id", nullable = false)
+    Users toUser;
 
-    @ManyToOne
-    @JoinColumn(name = "post_id", nullable = false)
-    Posts post;
+    @Column(name = "reported_id", nullable = false)
+    Long reportedId;
 
     @Column(nullable = false)
     String reason;
+
+    @Column(name = "content")
+    String content;
+
+    @ManyToOne
+    @JoinColumn(name = "type_report_id", nullable = false)
+    TypeReports typeReport;
+
 
     @Column(nullable = false)
     String status;

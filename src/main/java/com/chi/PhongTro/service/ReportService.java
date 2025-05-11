@@ -6,12 +6,14 @@ import com.chi.PhongTro.dto.Request.ReportUpdateRequest;
 import com.chi.PhongTro.dto.Response.ReportResponse;
 import com.chi.PhongTro.entity.Posts;
 import com.chi.PhongTro.entity.Reports;
+import com.chi.PhongTro.entity.TypeReports;
 import com.chi.PhongTro.entity.Users;
 import com.chi.PhongTro.exception.AppException;
 import com.chi.PhongTro.exception.ErrorCode;
 import com.chi.PhongTro.mapper.ReportMapper;
 import com.chi.PhongTro.repository.PostRepository;
 import com.chi.PhongTro.repository.ReportRepository;
+import com.chi.PhongTro.repository.TypeReportsRepository;
 import com.chi.PhongTro.repository.UsersRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +35,7 @@ public class ReportService {
 
     UsersRepository usersRepository;
 
-    PostRepository postRepository;
+    TypeReportsRepository typeReportsRepository;
 
     ReportMapper reportMapper;
 
@@ -43,20 +45,32 @@ public class ReportService {
         Users reporter = usersRepository.findByPhone(authentication.getName())
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
-        Users reportedUser = usersRepository.findById(request.getReportedUserId())
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        Users toUser;
 
-        Posts post = postRepository.findById(request.getPostId())
-                .orElseThrow(() -> new AppException(ErrorCode.POST_NOT_FOUND));
+        TypeReports typeReports = typeReportsRepository.findById(request.getTypeReportId())
+                .orElseThrow(() -> new AppException(ErrorCode.TYPE_REPORT_NOT_EXISTED));
+        if (typeReports.getName().equals("OWNER") || typeReports.getName().equals("POST")) {
+            toUser = usersRepository.findById("3")
+                    .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        }
+        else{
+            toUser = usersRepository.findByPhone(request.getToUserId())
+                    .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        }
+
 
         Reports report = Reports.builder()
                 .reporter(reporter)
-                .reportedUser(reportedUser)
-                .post(post)
+                .toUser(toUser)
+                .reportedId(Long.valueOf(request.getReportedId()))
                 .reason(request.getReason())
+                .content(request.getContent() != null ? request.getContent() : "" )
                 .status("pending")
+                .typeReport(typeReports)
                 .createdAt(LocalDate.now())
                 .build();
+
+
         report = reportRepository.save(report);
         return reportMapper.toReportResponse(report);
     }
@@ -69,7 +83,7 @@ public class ReportService {
                 .collect(Collectors.toList());
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') || hasRole('OWNER')")
     public ReportResponse updateReport(String reportId, ReportUpdateRequest request) {
         Reports report = reportRepository.findById(reportId)
                 .orElseThrow(() -> new AppException(ErrorCode.REPORT_NOT_FOUND));
@@ -84,6 +98,22 @@ public class ReportService {
 
         report = reportRepository.save(report);
         return reportMapper.toReportResponse(report);
+    }
+
+    public List<ReportResponse> getReportsByReporter(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return reportRepository.findAllByReporterPhone(authentication.getName())
+                .stream()
+                .map(reportMapper::toReportResponse)
+                .collect(Collectors.toList());
+    }
+
+    public List<ReportResponse> getReportsByToUser(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return reportRepository.findAllByToUserPhone(authentication.getName())
+                .stream()
+                .map(reportMapper::toReportResponse)
+                .collect(Collectors.toList());
     }
 
 

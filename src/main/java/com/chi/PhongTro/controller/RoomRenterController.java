@@ -79,4 +79,12 @@ public class RoomRenterController {
                 .build();
     }
 
+    @GetMapping("/my-rooms")
+    public ApiResponse<List<RoomRenterResponse>> getAllRoomOfRenter (){
+        return ApiResponse.<List<RoomRenterResponse>>builder()
+                .code(1000)
+                .result(roomRenterService.getAllRoomRentersByRenter())
+                .build();
+    }
+
 }

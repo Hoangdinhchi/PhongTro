@@ -11,6 +11,6 @@ import java.util.List;
 
 @Repository
 public interface PostRepository extends JpaRepository<Posts, String>, JpaSpecificationExecutor<Posts> {
-    @Query("SELECT p FROM Posts p WHERE p.user.user_id = :userId")
+    @Query("SELECT p FROM Posts p WHERE p.user.user_id = :userId ORDER BY p.createdAt DESC")
     List<Posts> findByUserId(@Param("userId") long userId);
 }

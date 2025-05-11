@@ -4,6 +4,7 @@ package com.chi.PhongTro.service;
 import com.chi.PhongTro.dto.Request.InvoiceCreationRequest;
 import com.chi.PhongTro.dto.Request.InvoiceDetailCreationRequest;
 import com.chi.PhongTro.dto.Request.InvoiceUpdateRequest;
+import com.chi.PhongTro.dto.Request.InvoiceUpdateStatusRequest;
 import com.chi.PhongTro.dto.Response.InvoiceResponse;
 import com.chi.PhongTro.dto.Response.RoomResponse;
 import com.chi.PhongTro.entity.*;
@@ -65,7 +66,7 @@ public class InvoiceService {
         }
 
         // Kiểm tra trạng thái hợp lệ
-        if (!List.of("pending", "paid", "overdue").contains(request.getStatus())) {
+        if (!List.of("pending", "paid", "overdue", "cancel").contains(request.getStatus())) {
             throw new AppException(ErrorCode.INVALID_STATUS);
         }
 
@@ -104,30 +105,12 @@ public class InvoiceService {
                 details.add(detail);
             }
         } else {
-            // Nếu không cung cấp chi tiết, tự động tạo dựa trên giá phòng và các khoản phí cố định
-            // 1. Tiền thuê phòng (dựa trên Rooms.price)
             InvoiceDetails rentDetail = InvoiceDetails.builder()
                     .invoice(invoice)
                     .description("Tiền thuê phòng")
                     .amount(room.getPrice())
                     .build();
             details.add(rentDetail);
-
-            // 2. Tiền điện (giả định 200,000 VNĐ)
-            InvoiceDetails electricityDetail = InvoiceDetails.builder()
-                    .invoice(invoice)
-                    .description("Tiền điện")
-                    .amount(200000.0)
-                    .build();
-            details.add(electricityDetail);
-
-            // 3. Tiền nước (giả định 100,000 VNĐ)
-            InvoiceDetails waterDetail = InvoiceDetails.builder()
-                    .invoice(invoice)
-                    .description("Tiền nước")
-                    .amount(100000.0)
-                    .build();
-            details.add(waterDetail);
         }
 
         // Thêm chi tiết vào hóa đơn
@@ -162,14 +145,37 @@ public class InvoiceService {
                 .collect(Collectors.toList());
     }
 
-    // Lấy hóa đơn theo ID (public)
+    public List<InvoiceResponse> getAllInvoicesByRenter() {
+        var context = SecurityContextHolder.getContext();
+        List<Invoices> invoices = invoiceRepository.findAllByRenterPhone(context.getAuthentication().getName());
+        return invoices.stream()
+                .map(invoiceMapper::toInvoiceResponse)
+                .collect(Collectors.toList());
+    }
+
+
+    @PreAuthorize("@invoiceService.checkInvoicePermission(#invoiceId, authentication)")
     public InvoiceResponse getInvoiceById(String invoiceId) {
         Invoices invoice = invoiceRepository.findById(invoiceId)
                 .orElseThrow(() -> new AppException(ErrorCode.INVOICE_NOT_FOUND));
         return invoiceMapper.toInvoiceResponse(invoice);
     }
 
-    // Cập nhật hóa đơn (Admin hoặc người tạo)
+    public List<InvoiceResponse> getInvoicesByRoomId(String roomId) {
+        return invoiceRepository.findAllByRoomId(roomId)
+                .stream()
+                .map(invoiceMapper::toInvoiceResponse)
+                .collect(Collectors.toList());
+    }
+
+    public List<InvoiceResponse> getInvoicesByRoomIdAndRenterPhone (String roomId, String phone){
+        return invoiceRepository.findAllByRoomIdAndRenterPhone(roomId, phone)
+                .stream()
+                .map(invoiceMapper::toInvoiceResponse)
+                .collect(Collectors.toList());
+    }
+
+
     @Transactional
     @PreAuthorize("@invoiceService.checkInvoicePermission(#invoiceId, authentication)")
     public InvoiceResponse updateInvoice(String invoiceId, InvoiceUpdateRequest request) {
@@ -181,7 +187,7 @@ public class InvoiceService {
         }
 
         if (request.getStatus() != null && !request.getStatus().isEmpty()) {
-            if (!List.of("pending", "paid", "overdue").contains(request.getStatus())) {
+            if (!List.of("pending", "paid", "overdue", "cancel").contains(request.getStatus())) {
                 throw new AppException(ErrorCode.INVALID_STATUS);
             }
             invoice.setStatus(request.getStatus());
@@ -191,6 +197,21 @@ public class InvoiceService {
             invoice.setDueDate(request.getDueDate());
         }
 
+        invoice = invoiceRepository.save(invoice);
+        return invoiceMapper.toInvoiceResponse(invoice);
+    }
+
+    @Transactional
+    @PreAuthorize("@invoiceService.checkInvoicePermission(#invoiceId, authentication)")
+    public InvoiceResponse updateStatus(String invoiceId, InvoiceUpdateStatusRequest request) {
+        Invoices invoice = invoiceRepository.findById(invoiceId)
+                .orElseThrow(() -> new AppException(ErrorCode.INVOICE_NOT_FOUND));
+
+        if (!List.of("pending", "paid", "overdue", "cancel").contains(request.getStatus())) {
+            throw new AppException(ErrorCode.INVALID_STATUS);
+        }
+
+        invoice.setStatus(request.getStatus());
         invoice = invoiceRepository.save(invoice);
         return invoiceMapper.toInvoiceResponse(invoice);
     }
@@ -222,6 +243,11 @@ public class InvoiceService {
         if (invoice == null) return false;
 
         return checkInvoiceCreationPermission(invoice.getOwner(), invoice.getRoom(), authentication);
+    }
+
+    public Invoices getInvoiceId(String invoiceId) {
+        return invoiceRepository.findById(invoiceId)
+                .orElseThrow(() -> new AppException(ErrorCode.INVOICE_NOT_FOUND));
     }
 
 }

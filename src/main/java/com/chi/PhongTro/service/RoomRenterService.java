@@ -7,7 +7,6 @@ import com.chi.PhongTro.dto.Response.RoomRenterResponse;
 import com.chi.PhongTro.entity.Renters;
 import com.chi.PhongTro.entity.RoomRenters;
 import com.chi.PhongTro.entity.Rooms;
-import com.chi.PhongTro.entity.Users;
 import com.chi.PhongTro.exception.AppException;
 import com.chi.PhongTro.exception.ErrorCode;
 import com.chi.PhongTro.mapper.RoomRenterMapper;
@@ -121,6 +120,15 @@ public class RoomRenterService {
                 .collect(Collectors.toList());
     }
 
+    public List<RoomRenterResponse> getAllRoomRentersByRenter(){
+        var context = SecurityContextHolder.getContext();
+        if(renterRepository.findByPhone(context.getAuthentication().getName()).isEmpty())
+            throw new AppException(ErrorCode.RENTER_NOT_FOUND);
+        return roomRenterRepository.findAllByRenterPhone(context.getAuthentication().getName())
+                .stream().map(RoomRenterResponse::new)
+                .collect(Collectors.toList());
+    }
+
 
     public boolean checkPermission(String roomId, String renterId, Authentication authentication){
         Rooms room = roomRepository.findById(roomId)
@@ -143,7 +151,8 @@ public class RoomRenterService {
                 .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
         boolean isCreator = (roomRenters.getRenter().getUser().getPhone().equals(currentPhone)
                 && roomRenters.getRoom().getBuilding().getUser().getPhone().equals(currentPhone));
-        return isAdmin || isCreator;
+        boolean isRenter = (roomRenters.getRenter().getPhone().equals(currentPhone));
+        return isAdmin || isCreator || isRenter;
     }
 
 }

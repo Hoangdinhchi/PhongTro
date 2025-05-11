@@ -10,8 +10,7 @@ public interface ReportMapper {
 
     @Mapping(target = "reporterId", source = "reporter.user_id")
     @Mapping(target = "reporterPhone", source = "reporter.phone")
-    @Mapping(target = "reportedUserId", source = "reportedUser.user_id")
-    @Mapping(target = "reportedUserPhone", source = "reportedUser.phone")
-    @Mapping(target = "postId", source = "post.post_id")
+    @Mapping(target = "toUserId", source = "toUser.user_id")
+    @Mapping(target = "toUserPhone", source = "toUser.phone")
     ReportResponse toReportResponse(Reports report);
 }
