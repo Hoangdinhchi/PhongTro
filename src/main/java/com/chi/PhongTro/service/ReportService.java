@@ -2,7 +2,9 @@ package com.chi.PhongTro.service;
 
 
 import com.chi.PhongTro.dto.Request.ReportCreationRequest;
+import com.chi.PhongTro.dto.Request.ReportFilterRequest;
 import com.chi.PhongTro.dto.Request.ReportUpdateRequest;
+import com.chi.PhongTro.dto.Response.PageResponse;
 import com.chi.PhongTro.dto.Response.ReportResponse;
 import com.chi.PhongTro.entity.Posts;
 import com.chi.PhongTro.entity.Reports;
@@ -15,9 +17,15 @@ import com.chi.PhongTro.repository.PostRepository;
 import com.chi.PhongTro.repository.ReportRepository;
 import com.chi.PhongTro.repository.TypeReportsRepository;
 import com.chi.PhongTro.repository.UsersRepository;
+import com.chi.PhongTro.specification.ReportSpecification;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -100,13 +108,67 @@ public class ReportService {
         return reportMapper.toReportResponse(report);
     }
 
-    public List<ReportResponse> getReportsByReporter(){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return reportRepository.findAllByReporterPhone(authentication.getName())
-                .stream()
-                .map(reportMapper::toReportResponse)
-                .collect(Collectors.toList());
+    public PageResponse<ReportResponse> getReportsByReporter(ReportFilterRequest request){
+
+        var context = SecurityContextHolder.getContext();
+        Authentication authentication = context.getAuthentication();
+        Users user = usersRepository.findByPhone(authentication.getName())
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+
+
+        Specification<Reports> specification = ReportSpecification.filterReport(
+                request.getTypeId(),
+                request.getStatus(),
+                request.getPhoneReporter(),
+                request.getReason(),
+                null,
+                String.valueOf(user.getUser_id())
+        );
+
+        Pageable pageable = PageRequest.of(
+                request.getPage(),
+                request.getSize(),
+                Sort.by("createdAt").descending()
+        );
+
+        Page<Reports> reportsPage = reportRepository.findAll(specification, pageable) ;
+
+        Page<ReportResponse> responsePage = reportsPage.map(reportMapper::toReportResponse);
+
+        return new PageResponse<>(responsePage);
     }
+
+
+    public PageResponse<ReportResponse> getReportByFilter(ReportFilterRequest request){
+
+        var context = SecurityContextHolder.getContext();
+        Authentication authentication = context.getAuthentication();
+        Users user = usersRepository.findByPhone(authentication.getName())
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+
+
+        Specification<Reports> specification = ReportSpecification.filterReport(
+                request.getTypeId(),
+                request.getStatus(),
+                request.getPhoneReporter(),
+                request.getReason(),
+                String.valueOf(user.getUser_id()),
+                null
+        );
+
+        Pageable pageable = PageRequest.of(
+                request.getPage(),
+                request.getSize(),
+                Sort.by("createdAt").descending()
+        );
+
+        Page<Reports> reportsPage = reportRepository.findAll(specification, pageable) ;
+
+        Page<ReportResponse> responsePage = reportsPage.map(reportMapper::toReportResponse);
+
+        return new PageResponse<>(responsePage);
+    }
+
 
     public List<ReportResponse> getReportsByToUser(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

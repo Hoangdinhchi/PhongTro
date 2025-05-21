@@ -1,11 +1,9 @@
 package com.chi.PhongTro.service;
 
 
-import com.chi.PhongTro.dto.Request.InvoiceCreationRequest;
-import com.chi.PhongTro.dto.Request.InvoiceDetailCreationRequest;
-import com.chi.PhongTro.dto.Request.InvoiceUpdateRequest;
-import com.chi.PhongTro.dto.Request.InvoiceUpdateStatusRequest;
+import com.chi.PhongTro.dto.Request.*;
 import com.chi.PhongTro.dto.Response.InvoiceResponse;
+import com.chi.PhongTro.dto.Response.PageResponse;
 import com.chi.PhongTro.dto.Response.RoomResponse;
 import com.chi.PhongTro.entity.*;
 import com.chi.PhongTro.exception.AppException;
@@ -15,10 +13,16 @@ import com.chi.PhongTro.repository.InvoiceRepository;
 import com.chi.PhongTro.repository.RenterRepository;
 import com.chi.PhongTro.repository.RoomRepository;
 import com.chi.PhongTro.repository.UsersRepository;
+import com.chi.PhongTro.specification.InvoiceSpecification;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -136,21 +140,69 @@ public class InvoiceService {
                 .map(invoiceMapper::toInvoiceResponse)
                 .collect(Collectors.toList());
     }
+//
+//    public List<InvoiceResponse> getAllInvoicesByOwner() {
+//        var context = SecurityContextHolder.getContext();
+//        List<Invoices> invoices = invoiceRepository.findAllByOwnerPhone(context.getAuthentication().getName());
+//        return invoices.stream()
+//                .map(invoiceMapper::toInvoiceResponse)
+//                .collect(Collectors.toList());
+//    }
 
-    public List<InvoiceResponse> getAllInvoicesByOwner() {
+
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
+    public PageResponse<InvoiceResponse> getAllInvoicesByOwner(InvoiceFilterRequest request) {
         var context = SecurityContextHolder.getContext();
-        List<Invoices> invoices = invoiceRepository.findAllByOwnerPhone(context.getAuthentication().getName());
-        return invoices.stream()
-                .map(invoiceMapper::toInvoiceResponse)
-                .collect(Collectors.toList());
+        Users user = usersRepository.findByPhone(context.getAuthentication().getName())
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        Specification<Invoices> spec = InvoiceSpecification.filterInvoice(
+                request.getStatus(),
+                request.getRoomName(),
+                request.getNameRenter(),
+                request.getPhoneRenter(),
+                request.getFromDate(),
+                request.getToDate(),
+                String.valueOf(user.getUser_id()),
+                null
+        );
+
+        Pageable pageable = PageRequest.of(
+                request.getPage(),
+                request.getSize(),
+                Sort.by("createdAt").descending()
+        );
+
+        Page<Invoices> invoicesPage = invoiceRepository.findAll(spec, pageable);
+        Page<InvoiceResponse> responsePage = invoicesPage.map(invoiceMapper::toInvoiceResponse);
+        return new PageResponse<>(responsePage);
     }
 
-    public List<InvoiceResponse> getAllInvoicesByRenter() {
+    public PageResponse<InvoiceResponse> getAllInvoicesByRenter(InvoiceFilterRequest request) {
         var context = SecurityContextHolder.getContext();
-        List<Invoices> invoices = invoiceRepository.findAllByRenterPhone(context.getAuthentication().getName());
-        return invoices.stream()
-                .map(invoiceMapper::toInvoiceResponse)
-                .collect(Collectors.toList());
+        Users user = usersRepository.findByPhone(context.getAuthentication().getName())
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        Specification<Invoices> spec = InvoiceSpecification.filterInvoice(
+                request.getStatus(),
+                request.getRoomName(),
+                null,
+                null,
+                request.getFromDate(),
+                request.getToDate(),
+                null,
+                user.getPhone()
+
+        );
+
+        Pageable pageable = PageRequest.of(
+                request.getPage(),
+                request.getSize(),
+                Sort.by("createdAt").descending()
+        );
+
+        Page<Invoices> invoicesPage = invoiceRepository.findAll(spec, pageable);
+        Page<InvoiceResponse> responsePage = invoicesPage.map(invoiceMapper::toInvoiceResponse);
+        return new PageResponse<>(responsePage);
+
     }
 
 
@@ -167,6 +219,8 @@ public class InvoiceService {
                 .map(invoiceMapper::toInvoiceResponse)
                 .collect(Collectors.toList());
     }
+
+
 
     public List<InvoiceResponse> getInvoicesByRoomIdAndRenterPhone (String roomId, String phone){
         return invoiceRepository.findAllByRoomIdAndRenterPhone(roomId, phone)
@@ -202,7 +256,7 @@ public class InvoiceService {
     }
 
     @Transactional
-    @PreAuthorize("@invoiceService.checkInvoicePermission(#invoiceId, authentication)")
+
     public InvoiceResponse updateStatus(String invoiceId, InvoiceUpdateStatusRequest request) {
         Invoices invoice = invoiceRepository.findById(invoiceId)
                 .orElseThrow(() -> new AppException(ErrorCode.INVOICE_NOT_FOUND));

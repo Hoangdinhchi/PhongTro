@@ -273,6 +273,7 @@ public class PostService {
     public PageResponse<PostResponse> getPostsWithFilter(PostFilterRequest request) {
         Specification<Posts> spec = PostSpecification.filterPost(
                 request.getTypeId(),
+                request.getStatus(),
                 request.getCity(),
                 request.getDistrict(),
                 request.getAddress(),
@@ -293,12 +294,14 @@ public class PostService {
         return new PageResponse<>(responsePage);
     }
 
-    @PreAuthorize("@postService.checkDeletePermission(#postId, authentication)")
-    public void updateStatusPost(String postId, PostStatusUpdateRequest request){
-        Posts post = postRepository.findById(postId).orElseThrow(
+    public void updateStatusPost(PostStatusUpdateRequest request){
+
+
+
+        Posts post = postRepository.findById(request.getPostId()).orElseThrow(
                 () -> new AppException(ErrorCode.POST_NOT_FOUND)
         );
-        if (!List.of("display", "hidden").contains(request.getStatus())) {
+        if (!List.of("display", "hidden", "pending").contains(request.getStatus())) {
             throw new AppException(ErrorCode.INVALID_STATUS);
         }
         post.setStatus(request.getStatus());

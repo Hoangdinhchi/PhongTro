@@ -2,7 +2,9 @@ package com.chi.PhongTro.service;
 
 
 import com.chi.PhongTro.dto.Request.RenterCreationRequest;
+import com.chi.PhongTro.dto.Request.RenterFilterRequest;
 import com.chi.PhongTro.dto.Request.RenterUpdateRequest;
+import com.chi.PhongTro.dto.Response.PageResponse;
 import com.chi.PhongTro.dto.Response.RenterResponse;
 import com.chi.PhongTro.entity.Renters;
 import com.chi.PhongTro.entity.Users;
@@ -11,11 +13,17 @@ import com.chi.PhongTro.exception.ErrorCode;
 import com.chi.PhongTro.mapper.RenterMapper;
 import com.chi.PhongTro.repository.RenterRepository;
 import com.chi.PhongTro.repository.UsersRepository;
+import com.chi.PhongTro.specification.RenterSpecification;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -89,11 +97,35 @@ public class RenterService {
         var context = SecurityContextHolder.getContext();
         Users user = usersRepository.findByPhone(context.getAuthentication().getName())
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-        List<Renters> renters = renterRepository.findByUserId(user.getUser_id());
+        List<Renters> renters = renterRepository.findAllByUser(user);
         return renters.stream()
                 .map(this::toRenterResponse)
                 .collect(Collectors.toList());
     }
+
+    public PageResponse<RenterResponse> getAllMyRenters(RenterFilterRequest request) {
+        var context = SecurityContextHolder.getContext();
+        Users user = usersRepository.findByPhone(context.getAuthentication().getName())
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+
+        Specification<Renters> spec = RenterSpecification.filterRenter(
+                request.getName(),
+                request.getPhone(),
+                String.valueOf(user.getUser_id())
+        );
+
+        Pageable pageable = PageRequest.of(
+                request.getPage(),
+                request.getSize(),
+                Sort.by("createdAt").descending()
+        );
+
+        Page<Renters> rentersPage = renterRepository.findAll(spec, pageable);
+        Page<RenterResponse> responsePage = rentersPage.map(this::toRenterResponse);
+
+        return new PageResponse<>(responsePage);
+    }
+
 
 
     @PreAuthorize("@renterService.checkRenterPermission(#renterId, authentication)")

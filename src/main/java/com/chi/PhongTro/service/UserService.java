@@ -1,6 +1,7 @@
 package com.chi.PhongTro.service;
 
 import com.chi.PhongTro.dto.Request.*;
+import com.chi.PhongTro.dto.Response.PageResponse;
 import com.chi.PhongTro.dto.Response.UserResponse;
 import com.chi.PhongTro.entity.Renters;
 import com.chi.PhongTro.entity.Users;
@@ -9,10 +10,16 @@ import com.chi.PhongTro.exception.ErrorCode;
 import com.chi.PhongTro.mapper.UserMapper;
 import com.chi.PhongTro.repository.RenterRepository;
 import com.chi.PhongTro.repository.UsersRepository;
+import com.chi.PhongTro.specification.UserSpecification;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -78,7 +85,7 @@ public class UserService {
         Users users = userMapper.toUser(request);
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
         users.setPassword(passwordEncoder.encode(request.getPassword()));
-        users.setCreated_at(LocalDate.now());
+        users.setCreatedAt(LocalDate.now());
         return userMapper.toUserReponse(usersRepository.save(users));
     }
 
@@ -101,6 +108,28 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
+    public PageResponse<UserResponse> getUsersWithFilter(UserFilterRequest request) {
+        Specification<Users> spec = UserSpecification.filterUser(
+                request.getUsername(),
+                request.getEmail(),
+                request.getPhone(),
+                request.getRole()
+        );
+
+        Pageable pageable = PageRequest.of(
+                request.getPage(),
+                request.getSize(),
+                Sort.by("createdAt").descending()
+        );
+
+        Page<Users> usersPage = usersRepository.findAll(spec, pageable);
+        Page<UserResponse> responsePage = usersPage.map(userMapper::toUserReponse);
+
+        return new PageResponse<>(responsePage);
+    }
+
+
 
     @PreAuthorize("hasRole('ADMIN')")
     public void deleteUser(String userid) {
@@ -112,8 +141,6 @@ public class UserService {
         Users users = usersRepository.findById(userid)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
         userMapper.updateUser(users, request);
-        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
-        users.setPassword(passwordEncoder.encode(request.getPassword()));
 
         return userMapper.toUserReponse(usersRepository.save(users));
 

@@ -12,6 +12,10 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class PostStatusUpdateRequest {
+
+    @NotBlank(message = "POST_ID_BLANK")
+            @NotNull(message = "POST_ID_NULL")
+    String postId;
     @NotBlank(message = "INVALID_STATUS")
     @NotNull(message = "INVALID_STATUS")
    String status;

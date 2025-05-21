@@ -24,14 +24,11 @@ public class Users {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     long user_id;
 
-
     String username;
     String password;
     String email;
     String phone;
     String avatar;
-
-
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Buildings> buildings = new ArrayList<>();
@@ -45,5 +42,6 @@ public class Users {
     @Enumerated(EnumType.STRING) // Lưu ENUM dưới dạng chuỗi
     @Column(nullable = false, columnDefinition = "ENUM('OWNER', 'RENTER', 'ADMIN') DEFAULT 'RENTER'")
     Role role;
-    LocalDate created_at;
+    @Column(name = "created_at")
+    LocalDate createdAt;
 }

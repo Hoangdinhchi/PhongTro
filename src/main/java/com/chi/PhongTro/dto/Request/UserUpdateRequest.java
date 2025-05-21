@@ -17,10 +17,6 @@ public class UserUpdateRequest {
     @NotBlank(message = "USERNAME_BLANK")
     String username;
 
-    @NotBlank(message = "PASSWORD_BLANK")
-    @Size(min = 6, message = "PASSWORD_INVALID")
-    String password;
-
     @Email(message = "EMAIL_INVALID")
     String email;
 
@@ -31,6 +27,6 @@ public class UserUpdateRequest {
     )
     String phone;
 
-    String avatar;
+
 
 }

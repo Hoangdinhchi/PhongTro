@@ -11,13 +11,11 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class InvoiceFilterRequest {
+public class TransactionFilterRequest {
     String status;
-    String roomName;
-    String phoneRenter;
-    String nameRenter;
     LocalDate fromDate;
     LocalDate toDate;
+
     int page = 0;
     int size = 10;
 }

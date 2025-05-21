@@ -8,7 +8,7 @@ import org.springframework.data.jpa.domain.Specification;
 
 
 public class PostSpecification {
-    public static Specification<Posts> filterPost(String typeId, String city, String district, String address,
+    public static Specification<Posts> filterPost(String typeId, String status, String city, String district, String address,
                                            Double minPrice, Double maxPrice, Double minArea, Double maxArea) {
 
         return (root, query, cb) -> {
@@ -18,6 +18,10 @@ public class PostSpecification {
             if (typeId != null && !typeId.isEmpty()) {
                 Join<Posts, RoomTypes> typeJoin = root.join("type");
                 predicates.add(cb.equal(typeJoin.get("type_id"), typeId));
+            }
+
+            if (status != null && !status.isEmpty()) {
+                predicates.add(cb.equal(cb.lower(root.get("status")), status.toLowerCase()));
             }
 
 
@@ -35,6 +39,7 @@ public class PostSpecification {
                 predicates.add(cb.like(cb.lower(root.get("address")), "%" + address.toLowerCase() + "%"));
             }
 
+      
 
             if (minPrice != null) {
                 predicates.add(cb.greaterThanOrEqualTo(root.get("price"), minPrice));
@@ -51,8 +56,8 @@ public class PostSpecification {
                 predicates.add(cb.lessThanOrEqualTo(root.get("area"), maxArea));
             }
 
-
-            predicates.add(cb.equal(root.get("status"), "display"));
+//
+//            predicates.add(cb.equal(root.get("status"), "display"));
 
             return cb.and(predicates.toArray(new Predicate[0]));
         };

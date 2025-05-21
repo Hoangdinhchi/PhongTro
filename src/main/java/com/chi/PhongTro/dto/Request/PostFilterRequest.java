@@ -13,6 +13,7 @@ public class PostFilterRequest {
     String typeId = null;
     String city = null;
     String district = null;
+    String status = null;
     String address = null;
     Double minPrice;
     Double maxPrice;

@@ -1,6 +1,7 @@
 package com.chi.PhongTro.controller;
 
 import com.chi.PhongTro.dto.Request.*;
+import com.chi.PhongTro.dto.Response.PageResponse;
 import com.chi.PhongTro.dto.Response.UserResponse;
 import com.chi.PhongTro.service.UserService;
 import jakarta.validation.Valid;
@@ -41,7 +42,6 @@ public class UserController {
     ApiResponse<UserResponse> updateUser(@RequestBody @Valid UserUpdateRequest request, @PathVariable String userId){
         ApiResponse<UserResponse> apiResponse = new ApiResponse<>();
         apiResponse.setResult(userService.updateUser(request,userId));
-
         return apiResponse;
     }
 
@@ -59,13 +59,10 @@ public class UserController {
     }
 
     @GetMapping
-    ApiResponse<List<UserResponse>> getUsers(){
+    ApiResponse<PageResponse<UserResponse>> getUsers(@ModelAttribute UserFilterRequest request){
 
-        var authentication = SecurityContextHolder.getContext().getAuthentication();
-
-
-        ApiResponse<List<UserResponse>> apiResponse = new ApiResponse<>();
-        apiResponse.setResult(userService.getUser());
+        ApiResponse<PageResponse<UserResponse>> apiResponse = new ApiResponse<>();
+        apiResponse.setResult(userService.getUsersWithFilter(request));
         return apiResponse;
     }
 

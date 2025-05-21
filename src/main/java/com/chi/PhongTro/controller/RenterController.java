@@ -2,7 +2,9 @@ package com.chi.PhongTro.controller;
 
 import com.chi.PhongTro.dto.Request.ApiResponse;
 import com.chi.PhongTro.dto.Request.RenterCreationRequest;
+import com.chi.PhongTro.dto.Request.RenterFilterRequest;
 import com.chi.PhongTro.dto.Request.RenterUpdateRequest;
+import com.chi.PhongTro.dto.Response.PageResponse;
 import com.chi.PhongTro.dto.Response.RenterResponse;
 import com.chi.PhongTro.service.RenterService;
 import jakarta.validation.Valid;
@@ -29,7 +31,15 @@ public class RenterController {
     }
 
     @GetMapping
-    ApiResponse<List<RenterResponse>> getAllMyRenter(){
+    ApiResponse<PageResponse<RenterResponse>> getAllMyRenter(@ModelAttribute  RenterFilterRequest request){
+        return ApiResponse.<PageResponse<RenterResponse>>builder()
+                .code(1000)
+                .result(renterService.getAllMyRenters(request))
+                .build();
+    }
+
+    @GetMapping("/my-renter")
+    public ApiResponse<List<RenterResponse>> getAllRenter(){
         return ApiResponse.<List<RenterResponse>>builder()
                 .code(1000)
                 .result(renterService.getAllMyRenters())

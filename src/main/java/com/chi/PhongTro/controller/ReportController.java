@@ -3,7 +3,9 @@ package com.chi.PhongTro.controller;
 
 import com.chi.PhongTro.dto.Request.ApiResponse;
 import com.chi.PhongTro.dto.Request.ReportCreationRequest;
+import com.chi.PhongTro.dto.Request.ReportFilterRequest;
 import com.chi.PhongTro.dto.Request.ReportUpdateRequest;
+import com.chi.PhongTro.dto.Response.PageResponse;
 import com.chi.PhongTro.dto.Response.ReportResponse;
 import com.chi.PhongTro.service.ReportService;
 import lombok.AccessLevel;
@@ -43,18 +45,27 @@ public class ReportController {
     }
 
     @GetMapping("/reporters")
-    public ApiResponse<List<ReportResponse>> getAllReportsByReporter() {
-        return ApiResponse.<List<ReportResponse>>builder()
+    public ApiResponse<PageResponse<ReportResponse>> getAllReportsByReporter(@ModelAttribute ReportFilterRequest request) {
+        return ApiResponse.<PageResponse<ReportResponse>>builder()
                 .code(1000)
-                .result(reportService.getReportsByReporter())
+                .result(reportService.getReportsByReporter(request))
                 .build();
     }
 
     @GetMapping("/to-user")
-    public ApiResponse<List<ReportResponse>> getAllReportsByToUser() {
-        return ApiResponse.<List<ReportResponse>>builder()
+    public ApiResponse<PageResponse<ReportResponse>> getAllReportsByToUser(ReportFilterRequest request) {
+        return ApiResponse.<PageResponse<ReportResponse>>builder()
                 .code(1000)
-                .result(reportService.getReportsByToUser ())
+                .result(reportService.getReportByFilter(request))
+                .build();
+    }
+
+
+    @GetMapping("/admin")
+    public ApiResponse<PageResponse<ReportResponse>> getAllReportsByAdmin(@ModelAttribute ReportFilterRequest request) {
+        return ApiResponse.<PageResponse<ReportResponse>>builder()
+                .code(1000)
+                .result(reportService.getReportByFilter(request))
                 .build();
     }
 
@@ -74,9 +85,7 @@ public class ReportController {
         reportService.deleteReport(reportId);
         return ApiResponse.<String>builder()
                 .code(1000)
-                .result("Đã xóa báo cáo")
+                .result("Deleted report with id: " + reportId + " successfully")
                 .build();
     }
-
-
 }

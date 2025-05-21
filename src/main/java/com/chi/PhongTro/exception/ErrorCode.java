@@ -35,6 +35,8 @@ public enum ErrorCode {
     FILE_PROCESSING_ERROR(1042, "Lỗi khi xử lý file"),
     POST_NOT_FOUND(1043, "Bài đăng không tồn tại"),
     INVALID_STATUS(1044, "Trạng thái không hợp lệ"),
+    POST_ID_NULL(1045, "Mã bài đăng null"),
+    POST_ID_BLANK(1046, "Mã bài đăng rỗng"),
 
     COMMENT_NOT_FOUND(1050, "Bình luận không tồn tại"),
     COMMENT_NULL(1051, "Bình luận không được đổ trống"),
@@ -65,7 +67,18 @@ public enum ErrorCode {
     RENTER_ID_NULL(1111, "Mã người thuê không được trống"),
     ROOM_RENTER_NOT_FOUND(1112, "Thông tin thuê phòng không tồn tại"),
 
-    TYPE_REPORT_NOT_EXISTED(1113, "Loại báo cáo không phù hợp")
+    TYPE_REPORT_NOT_EXISTED(1113, "Loại báo cáo không phù hợp"),
+
+    OWNER_NULL(1120, "Người thêm yêu cầu không được để trống"),
+    AMOUNT_NULL(1121, "Số tiền không được để trống"),
+    AMOUNT_EMPTY(1122, "Số tiền không được rỗng"),
+    BANK_NAME_NULL(1123, "Tên tài khoản null"),
+    BANK_NAME_EMPTY(1124, "Tên tài khoản rỗng"),
+    BANK_ACCOUNT_NUMBER_NULL(1125, "Số tài khoản null"),
+    BANK_ACCOUNT_NUMBER_EMPTY(1126, "Số tài khoản rỗng"),
+    ACCOUNT_HOLDER_NAME_NULL(1127, "Tên chủ thẻ null"),
+    ACCOUNT_HOLDER_NAME_EMPTY(1128, "Tên chủ thẻ rỗng"),
+    AMOUNT_IS_VALID(1129, "Số tiền không hợp lệ"),
 
     ;
 

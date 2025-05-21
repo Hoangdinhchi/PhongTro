@@ -2,8 +2,10 @@ package com.chi.PhongTro.controller;
 
 import com.chi.PhongTro.dto.Request.ApiResponse;
 import com.chi.PhongTro.dto.Request.InvoiceCreationRequest;
+import com.chi.PhongTro.dto.Request.InvoiceFilterRequest;
 import com.chi.PhongTro.dto.Request.InvoiceUpdateStatusRequest;
 import com.chi.PhongTro.dto.Response.InvoiceResponse;
+import com.chi.PhongTro.dto.Response.PageResponse;
 import com.chi.PhongTro.entity.Invoices;
 import com.chi.PhongTro.service.DocumentGenerationService;
 import com.chi.PhongTro.service.InvoiceService;
@@ -74,19 +76,19 @@ public class InvoiceController {
     }
 
     @GetMapping("/my-invoices")
-    ApiResponse<List<InvoiceResponse>> getAllInvoicesByOwner(){
-        return ApiResponse.<List<InvoiceResponse>>builder()
+    ApiResponse<PageResponse<InvoiceResponse>> getAllInvoicesByOwner(@ModelAttribute InvoiceFilterRequest request){
+        return ApiResponse.<PageResponse<InvoiceResponse>>builder()
                 .code(1000)
-                .result(invoiceService.getAllInvoicesByOwner())
+                .result(invoiceService.getAllInvoicesByOwner(request))
                 .build();
     }
 
 
     @GetMapping("/renter-invoices")
-    ApiResponse<List<InvoiceResponse>> getAllInvoicesByRenter(){
-        return ApiResponse.<List<InvoiceResponse>>builder()
+    ApiResponse<PageResponse<InvoiceResponse>> getAllInvoicesByRenter(@ModelAttribute InvoiceFilterRequest request){
+        return ApiResponse.<PageResponse<InvoiceResponse>>builder()
                 .code(1000)
-                .result(invoiceService.getAllInvoicesByRenter())
+                .result(invoiceService.getAllInvoicesByRenter(request))
                 .build();
     }
 

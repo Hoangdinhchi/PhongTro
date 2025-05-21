@@ -1,7 +1,9 @@
 package com.chi.PhongTro.repository;
 
 import com.chi.PhongTro.entity.Renters;
+import com.chi.PhongTro.entity.Users;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -10,8 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface RenterRepository extends JpaRepository<Renters, String> {
-
+public interface RenterRepository extends JpaRepository<Renters, String>, JpaSpecificationExecutor<Renters> {
 
     Optional<Renters> findByPhone(String phone);
 
@@ -24,4 +25,7 @@ public interface RenterRepository extends JpaRepository<Renters, String> {
 
     @Query("SELECT EXISTS(SELECT 1 FROM Renters r WHERE r.user.user_id = :userId AND r.email = :email)")
     boolean exitsByUserIdAndEmail(@Param("userId") long userId,@Param("email") String email);
+
+    List<Renters> findAllByUser(Users user);
+
 }

@@ -32,13 +32,6 @@ public class PostController {
         return apiResponse;
     }
 
-//    @GetMapping
-//    ApiResponse<List<PostResponse>> getAllPost(){
-//        ApiResponse<List<PostResponse>> apiResponse = new ApiResponse<>();
-//        apiResponse.setResult(postService.getAllPost());
-//        return apiResponse;
-//    }
-
     @GetMapping("/{postId}")
     ApiResponse<PostResponse> getPostById(@PathVariable String postId){
         return ApiResponse.<PostResponse>builder()
@@ -61,6 +54,7 @@ public class PostController {
     @GetMapping
     ApiResponse<PageResponse<PostResponse>> getPosts(@ModelAttribute PostFilterRequest request){
         return ApiResponse.<PageResponse<PostResponse>>builder()
+                .code(1000)
                 .result(postService.getPostsWithFilter(request))
                 .build();
     }
@@ -82,11 +76,12 @@ public class PostController {
                 .build();
     }
 
-    @PatchMapping("/{postId}/status")
-    ApiResponse<String> updateStatusPost(@PathVariable String postId, @RequestBody @Valid PostStatusUpdateRequest request){
-        postService.updateStatusPost(postId, request);
+    @PatchMapping("/update-status")
+    ApiResponse<String> updateStatusPost(@RequestBody @Valid PostStatusUpdateRequest request){
+        postService.updateStatusPost(request);
         return ApiResponse.<String>builder()
-                .result("Cập nhật trạng thái thành công")
+                .code(1000)
+                .result("Update status post success")
                 .build();
     }
 }
